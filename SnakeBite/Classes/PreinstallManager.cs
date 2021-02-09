@@ -1,70 +1,120 @@
 ﻿using ICSharpCode.SharpZipLib.Zip;
 using SnakeBite.Forms;
+using SnakeBite.GzsTool;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace SnakeBite
 {
     internal static class PreinstallManager
     {
-        /*
-         * PreinstallManager
-         * Designed to support formInstallOrder with file reading/writing, conflict checking and installation processing
-         * 
-         */
-        internal static string GameDir { get { return Properties.Settings.Default.InstallPath; } }
-
-        public static void RefreshXml(List<PreinstallEntry> Mods) // adds mods to an .xml file. Similar to snakebite.xml, but with yet-to-be-installed mods.
+        public static void RemoveFromXml(PreinstallEntry mod)
         {
-            FastZip unzipper = new FastZip();
-            SettingsManager infoXml = new SettingsManager("_extr", "buildInfo.xml");
-            // SettingsManager was originally a static class for managing snakebite.xml. It has been modified to manage buildInfo.xml as well.
+            new SettingsManager("_extr\\buildInfo.xml").RemoveMod(mod.modInfo);
+        }
 
-            infoXml.ClearAllMods();
-            foreach (PreinstallEntry mod in Mods)
+        public static void AddModsToXml(params PreinstallEntry[] modsArrary)
+        {
+            HashingExtended.ReadDictionary();
+            foreach (PreinstallEntry mod in modsArrary)
             {
+                FastZip unzipper = new FastZip();
                 unzipper.ExtractZip(mod.filename, "_extr", "metadata.xml");
                 ModEntry metaData = new ModEntry("_extr\\metadata.xml");
-                infoXml.AddMod(metaData);
+
+                Dictionary<string, string> newNameDictionary = new Dictionary<string, string>();
+                int foundUpdate = 0;
+
+                Debug.LogLine(string.Format("[PreinstallCheck] Checking for Qar path updates: {0}", metaData.Name), Debug.LogLevel.Basic);
+                foreach (ModQarEntry modQar in metaData.ModQarEntries.Where(entry => !entry.FilePath.StartsWith("/Assets/")))
+                {
+                    string unhashedName = HashingExtended.UpdateName(modQar.FilePath);
+                    if (unhashedName != null)
+                    {
+                        Debug.LogLine(string.Format("[PreinstallCheck] Update successful: {0} -> {1}", modQar.FilePath, unhashedName), Debug.LogLevel.Basic);
+                        newNameDictionary.Add(modQar.FilePath, unhashedName);
+                        modQar.FilePath = unhashedName;
+                        foundUpdate++;
+                    }
+                }
+                if (foundUpdate > 0)
+                {
+                    foreach (ModFpkEntry modFpkEntry in metaData.ModFpkEntries)
+                    {
+                        string unHashedName;
+                        if (newNameDictionary.TryGetValue(modFpkEntry.FpkFile, out unHashedName))
+                            modFpkEntry.FpkFile = unHashedName;
+                    }
+                }
+
+                new SettingsManager("_extr\\buildInfo.xml").AddMod(metaData);
                 mod.modInfo = metaData;
-            } // adds each user-selected filename to the metadata list.
+            }
+
+        }
+
+        public static void RefreshAllXml(List<PreinstallEntry> mods)
+        {
+            new SettingsManager("_extr\\buildInfo.xml").ClearAllMods();
+            AddModsToXml(mods.ToArray());
         }
 
         public static List<ModEntry> getModEntries()
         {
-            return new SettingsManager("_extr", "buildInfo.xml").GetInstalledMods();
+            return new SettingsManager("_extr\\buildInfo.xml").GetInstalledMods();
         }
 
-        public static void getConflictList(List<PreinstallEntry> Mods) // checks each mod against one another for conflicts, and adds conflicting mods to a list.
+        public static void getAllConflicts(List<PreinstallEntry> allMods) // checks each mod against one another for conflicts, and adds conflicting mods to a list.
         {
-
-            for (int i = 0; i < Mods.Count; i++)
+            List<PreinstallEntry> ModsChecked = new List<PreinstallEntry>();
+            foreach (PreinstallEntry modA in allMods) // modA, modB, modC...
             {
-                Mods[i].ModConflicts = new List<string>();
-                for (int j = 0; j < Mods.Count; j++)
+                Debug.LogLine(String.Format("[PreinstallCheck] Checking for conflicts: {0}", modA.modInfo.Name), Debug.LogLevel.Basic);
+                bool Skip = true;
+                foreach (PreinstallEntry modB in allMods) // [modA -> modA], [modA -> modB], [modA -> modC]
                 {
-                    if (hasConflict(Mods[i].modInfo, Mods[j].modInfo))
+                    if (modA.Equals(modB)) { Skip = false; continue; } // skip reflexive compare (i.e. [modA -> modA])
+                    if (Skip) { continue; } // skip previous compares (i.e. [modB -> modA], [modC -> modB], [modC -> modA])
+
+                    if (hasConflict(modA.modInfo, modB.modInfo)) // [modA -> modB], [modA -> modC], [modB -> modC]
                     {
-                        if ((i != j) && (!Mods[i].ModConflicts.Contains(Mods[j].modInfo.Name)))
-                            Mods[i].ModConflicts.Add(Mods[j].modInfo.Name);
+                        modA.ModConflicts.Add(modB.modInfo.Name);
+                        modB.ModConflicts.Add(modA.modInfo.Name);
                     }
-                }//the list of names is saved to a list. The conflictingModLists' index corresponds with ModFile's index, allowing snakebite to easily look up any given mod's conflicts.
+
+                }
             }
         }
 
-        public static bool hasConflict(ModEntry mod1, ModEntry mod2) //returns true as soon as a conflict is found, for the sake of speed efficiency.
+        public static void GetConflicts(PreinstallEntry addedMod, List<PreinstallEntry> listedMods) // checks each mod against one another for conflicts, and adds conflicting mods to a list.
+        {
+
+            Debug.LogLine(String.Format("[PreinstallCheck] Checking for conflicts: {0}", addedMod.modInfo.Name), Debug.LogLevel.Basic);
+            foreach (PreinstallEntry listedMod in listedMods)
+            {
+                if (addedMod.Equals(listedMod) || listedMod.ModConflicts.Contains(addedMod.modInfo.Name)) continue;
+
+                if (hasConflict(addedMod.modInfo, listedMod.modInfo))
+                {
+                    addedMod.ModConflicts.Add(listedMod.modInfo.Name);
+                    listedMod.ModConflicts.Add(addedMod.modInfo.Name);
+                }
+
+            }
+        }
+
+        public static bool hasConflict(ModEntry mod1, ModEntry mod2)
         {
             foreach (ModQarEntry qarEntry in mod1.ModQarEntries) // iterate qar files from new mod
             {
-                if (qarEntry.FilePath.Contains(".fpk")) continue;
+                if (qarEntry.FilePath.EndsWith(".fpk") || qarEntry.FilePath.EndsWith(".fpkd")) continue;
                 ModQarEntry conflicts = mod2.ModQarEntries.FirstOrDefault(entry => Tools.CompareHashes(entry.FilePath, qarEntry.FilePath));
                 if (conflicts != null)
                 {
+                    Debug.LogLine(String.Format("[PreinstallCheck] Conflict found between {0} and {1}: {2}", mod1.Name, mod2.Name, conflicts.FilePath), Debug.LogLevel.Basic);
                     return true;
                 }
             }
@@ -129,8 +179,10 @@ namespace SnakeBite
                 // Check if mod requires SB update
                 if (modSBVersion > SBVersion)
                 {
-                    MessageBox.Show(String.Format("{0} requires SnakeBite version {1} or newer. Please follow the link on the Settings page to get the latest version.", metaData.Name, metaData.SBVersion), "Update required", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    ModFiles.RemoveAt(i);
+                    if (DialogResult.Yes != MessageBox.Show($"'{metaData.Name}' was created with SnakeBite {metaData.SBVersion.AsString()} and may not be compatible with {SBVersion}.\n\nContinue?", "Update required", MessageBoxButtons.YesNo, MessageBoxIcon.Warning))
+                    {
+                        ModFiles.RemoveAt(i);
+                    }
                     continue;
                 }
 
@@ -140,28 +192,6 @@ namespace SnakeBite
                     ModFiles.RemoveAt(i);
                     continue;
                 }
-
-                // Check MGS version compatibility 
-                 
-               /* if (MGSVersion != modMGSVersion && modMGSVersion != new Version(0, 0, 0, 0))
-                {
-                    if (MGSVersion > modMGSVersion && modMGSVersion > new Version(0, 0, 0, 0))
-                    {
-                        var contInstall = MessageBox.Show(String.Format("{0} appears to be for an older version of MGSV. It is recommended that you at least check for an updated version before installing.\n\nWould you still like to install this mod?", metaData.Name), "Game version mismatch", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-                        if (contInstall == DialogResult.No)
-                        {
-                            ModFiles.RemoveAt(i);
-                            continue;
-                        }
-                    }
-                    if (MGSVersion < modMGSVersion)
-                    {
-                        MessageBox.Show(String.Format("{0} requires MGSV version {1}, but your installation is version {2}. Please update MGSV and try again.", metaData.Name, modMGSVersion, MGSVersion), "Update required", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        ModFiles.RemoveAt(i);
-                       continue;
-                    }
-                }
-                */
             }
         }
 
@@ -171,7 +201,7 @@ namespace SnakeBite
             //return a list of mods that the user has OK'd
             int confCounter;
             int confIndex;
-            SettingsManager manager = new SettingsManager(GameDir);
+            SettingsManager manager = new SettingsManager(GamePaths.SnakeBiteSettings);
             var mods = manager.GetInstalledMods();
             List<string> conflictingMods;
             ModEntry metaData;
@@ -185,8 +215,7 @@ namespace SnakeBite
                 confIndex = -1;
                 conflictingMods = new List<string>();
 
-                Debug.LogLine(String.Format("[Mod] Checking conflicts for {0}", metaData.Name));
-
+                Debug.LogLine(String.Format("[PreinstallCheck] Checking conflicts for {0}", metaData.Name), Debug.LogLevel.Basic);
                 foreach (ModEntry mod in mods) // iterate through installed mods [Morbid: TODO iterate pftxs files as well]
                 {
                     foreach (ModFileEntry fileEntry in metaData.ModFileEntries) // iterate external files from new mod
@@ -196,20 +225,20 @@ namespace SnakeBite
                         {
                             if (confIndex == -1) confIndex = mods.IndexOf(mod);
                             if (!conflictingMods.Contains(mod.Name)) conflictingMods.Add(mod.Name);
-                            Debug.LogLine(String.Format("[{0}] Conflict in 00.dat: {1}", mod.Name, conflicts.FilePath));
+                            Debug.LogLine(String.Format("[{0}] Conflict in 00.dat: {1}", mod.Name, conflicts.FilePath), Debug.LogLevel.Basic);
                             confCounter++;
                         }
                     }
 
                     foreach (ModQarEntry qarEntry in metaData.ModQarEntries) // iterate qar files from new mod
                     {
-                        if (qarEntry.FilePath.Contains(".fpk")) continue;
+                        if (qarEntry.FilePath.EndsWith(".fpk") || qarEntry.FilePath.EndsWith(".fpkd")) continue;
                         ModQarEntry conflicts = mod.ModQarEntries.FirstOrDefault(entry => Tools.CompareHashes(entry.FilePath, qarEntry.FilePath));
                         if (conflicts != null)
                         {
                             if (confIndex == -1) confIndex = mods.IndexOf(mod);
                             if (!conflictingMods.Contains(mod.Name)) conflictingMods.Add(mod.Name);
-                            Debug.LogLine(String.Format("[{0}] Conflict in 00.dat: {1}", mod.Name, conflicts.FilePath));
+                            Debug.LogLine(String.Format("[{0}] Conflict in 00.dat: {1}", mod.Name, conflicts.FilePath), Debug.LogLevel.Basic);
                             confCounter++;
                         }
                     }
@@ -222,7 +251,7 @@ namespace SnakeBite
                         {
                             if (confIndex == -1) confIndex = mods.IndexOf(mod);
                             if (!conflictingMods.Contains(mod.Name)) conflictingMods.Add(mod.Name);
-                            Debug.LogLine(String.Format("[{0}] Conflict in {2}: {1}", mod.Name, conflicts.FilePath, Path.GetFileName(conflicts.FpkFile)));
+                            Debug.LogLine(String.Format("[{0}] Conflict in {2}: {1}", mod.Name, conflicts.FilePath, Path.GetFileName(conflicts.FpkFile)), Debug.LogLevel.Basic);
                             confCounter++;
                         }
                     }
@@ -232,13 +261,12 @@ namespace SnakeBite
 
                 if (conflictingMods.Count > 0)
                 {
-                    Debug.LogLine(String.Format("[Mod] Found {0} conflicts", confCounter));
-                    string msgboxtext = String.Format("\"{0}\" conflicts with the following pre-existing mods:\n\n", Tools.ReadMetaData(ModFiles[i]).Name);
+                    Debug.LogLine(String.Format("[Mod] Found {0} conflicts", confCounter), Debug.LogLevel.Basic);
+                    string msgboxtext = String.Format("\"{0}\" conflicts with mods that are already installed:\n", Tools.ReadMetaData(ModFiles[i]).Name);
                     foreach (string Conflict in conflictingMods)
                     {
-                        msgboxtext += String.Format("\"{0}\"\n", Conflict);
+                        msgboxtext += String.Format("\n\"{0}\"", Conflict);
                     }
-                    msgboxtext += "\n\nMore information regarding these conflicts can be found in the Debug Logs.";
                     DialogResult userInput = conflictForm.ShowDialog(msgboxtext);
                     if (userInput == DialogResult.Cancel)
                     {
@@ -247,7 +275,7 @@ namespace SnakeBite
                     }
                 }
 
-                Debug.LogLine("[Mod] No conflicts found");
+                Debug.LogLine("[Mod] No conflicts found", Debug.LogLevel.Basic);
 
                 bool sysConflict = false;
                 // check for system file conflicts
@@ -266,7 +294,7 @@ namespace SnakeBite
                     //tex TODO: figure out what it's actually checking and how this can be corrupted
                     string msgboxtext = String.Format("\"{0}\" conflicts with existing MGSV system files,\n", Tools.ReadMetaData(ModFiles[i]).Name);
                     msgboxtext += "or the snakebite.xml base entries has become corrupt.\n";
-                    msgboxtext += "Please use the Restore Original Game Files option in Snakebite settings and re-run snakebite\n";
+                    msgboxtext += "Please use the 'Restore Backup Game Files' option in Snakebite settings and re-run snakebite\n";
                     DialogResult userInput = conflictForm.ShowDialog(msgboxtext);
                     if (userInput == DialogResult.Cancel)
                     {
@@ -278,14 +306,14 @@ namespace SnakeBite
         }
 
         public static bool CheckConflicts(string ModFile)
-        { //Morbid: Conflict check has been reworked as of 0.9.0. CheckConflicts is now split into PreinstallManager.FilterModValidity and PreinstallManager.FilterModConflicts.
-          //        CheckConflicts is only used for command-line installation.
+        {
             ModEntry metaData = Tools.ReadMetaData(ModFile);
             if (metaData == null) return false;
             // check version conflicts
             var SBVersion = ModManager.GetSBVersion();
             var MGSVersion = ModManager.GetMGSVersion();
 
+            SettingsManager manager = new SettingsManager(GamePaths.SnakeBiteSettings);
             Version modSBVersion = new Version();
             Version modMGSVersion = new Version();
             try
@@ -314,11 +342,11 @@ namespace SnakeBite
             }
 
             // Check MGS version compatibility
-            if (MGSVersion != modMGSVersion && modMGSVersion != new Version(0, 0, 0, 0))
+            if (!manager.IsUpToDate(modMGSVersion))
             {
-                if (MGSVersion > modMGSVersion && modMGSVersion > new Version(0, 0, 0, 0))
+                if (MGSVersion > modMGSVersion)
                 {
-                    var contInstall = MessageBox.Show(String.Format("{0} appears to be for an older version of MGSV. It is recommended that you at least check for an updated version before installing.\n\nContinue installation?", metaData.Name), "Game version mismatch", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                    var contInstall = MessageBox.Show(String.Format("{0} appears to be for an older version of MGSV. It is recommended that you check for an updated version before installing.\n\nContinue installation?", metaData.Name), "Game version mismatch", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
                     if (contInstall == DialogResult.No) return false;
                 }
                 if (MGSVersion < modMGSVersion)
@@ -330,10 +358,9 @@ namespace SnakeBite
             //end of validity checks
 
 
-            Debug.LogLine(String.Format("[Mod] Checking conflicts for {0}", metaData.Name));
+            Debug.LogLine(String.Format("[Mod] Checking conflicts for {0}", metaData.Name), Debug.LogLevel.Basic);
             int confCounter = 0;
             // search installed mods for conflicts
-            SettingsManager manager = new SettingsManager(GameDir);
             var mods = manager.GetInstalledMods();
             List<string> conflictingMods = new List<string>();
             int confIndex = -1;
@@ -346,20 +373,20 @@ namespace SnakeBite
                     {
                         if (confIndex == -1) confIndex = mods.IndexOf(mod);
                         if (!conflictingMods.Contains(mod.Name)) conflictingMods.Add(mod.Name);
-                        Debug.LogLine(String.Format("[{0}] Conflict in 00.dat: {1}", mod.Name, conflicts.FilePath));
+                        Debug.LogLine(String.Format("[{0}] Conflict in 00.dat: {1}", mod.Name, conflicts.FilePath), Debug.LogLevel.Basic);
                         confCounter++;
                     }
                 }
 
                 foreach (ModQarEntry qarEntry in metaData.ModQarEntries) // iterate qar files from new mod
                 {
-                    if (qarEntry.FilePath.Contains(".fpk")) continue;
+                    if (qarEntry.FilePath.EndsWith(".fpk") || qarEntry.FilePath.EndsWith(".fpkd")) continue;
                     ModQarEntry conflicts = mod.ModQarEntries.FirstOrDefault(entry => Tools.CompareHashes(entry.FilePath, qarEntry.FilePath));
                     if (conflicts != null)
                     {
                         if (confIndex == -1) confIndex = mods.IndexOf(mod);
                         if (!conflictingMods.Contains(mod.Name)) conflictingMods.Add(mod.Name);
-                        Debug.LogLine(String.Format("[{0}] Conflict in 00.dat: {1}", mod.Name, conflicts.FilePath));
+                        Debug.LogLine(String.Format("[{0}] Conflict in 00.dat: {1}", mod.Name, conflicts.FilePath), Debug.LogLevel.Basic);
                         confCounter++;
                     }
                 }
@@ -372,7 +399,7 @@ namespace SnakeBite
                     {
                         if (confIndex == -1) confIndex = mods.IndexOf(mod);
                         if (!conflictingMods.Contains(mod.Name)) conflictingMods.Add(mod.Name);
-                        Debug.LogLine(String.Format("[{0}] Conflict in {2}: {1}", mod.Name, conflicts.FilePath, Path.GetFileName(conflicts.FpkFile)));
+                        Debug.LogLine(String.Format("[{0}] Conflict in {2}: {1}", mod.Name, conflicts.FilePath, Path.GetFileName(conflicts.FpkFile)), Debug.LogLevel.Basic);
                         confCounter++;
                     }
                 }
@@ -382,7 +409,7 @@ namespace SnakeBite
 
             if (conflictingMods.Count > 0)
             {
-                Debug.LogLine(String.Format("[Mod] Found {0} conflicts", confCounter));
+                Debug.LogLine(String.Format("[Mod] Found {0} conflicts", confCounter), Debug.LogLevel.Basic);
                 string msgboxtext = "The selected mod conflicts with these mods:\n";
                 foreach (string Conflict in conflictingMods)
                 {
@@ -393,7 +420,7 @@ namespace SnakeBite
                 return false;
             }
 
-            Debug.LogLine("[Mod] No conflicts found");
+            Debug.LogLine("[Mod] No conflicts found", Debug.LogLevel.Basic);
 
             bool sysConflict = false;
             // check for system file conflicts
@@ -412,7 +439,7 @@ namespace SnakeBite
                 //tex TODO: figure out what it's actually checking and how this can be corrupted
                 string msgboxtext = "The selected mod conflicts with existing MGSV system files,\n";
                 msgboxtext += "or the snakebite.xml base entries has become corrupt.\n";
-                msgboxtext += "Please use the Restore Original Game Files option in Snakebite settings and re-run snakebite\n";
+                msgboxtext += "Please use the 'Restore Backup Game Files' option in Snakebite settings and re-run snakebite\n";
                 MessageBox.Show(msgboxtext, "SnakeBite", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
@@ -425,7 +452,7 @@ namespace SnakeBite
 
         public ModEntry modInfo { get; set; }
 
-        public List<string> ModConflicts { get; set; }
+        public List<string> ModConflicts = new List<string>();
         
     }
 }

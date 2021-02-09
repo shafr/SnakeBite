@@ -203,11 +203,12 @@ namespace SnakeBite
 
         private void StartGame(bool silent = false)
         {
-            SettingsManager manager = new SettingsManager(ModManager.GameDir);
+            SettingsManager manager = new SettingsManager(GamePaths.SnakeBiteSettings);
             if (manager.ValidInstallPath)
             {
-                Process.Start(ModManager.GameDir + "\\mgsvtpp.exe");
-                ExitLauncher(silent);
+                Process.Start(GamePaths.GameDir + "\\mgsvtpp.exe");
+                if (Properties.Settings.Default.CloseSnakeBiteOnLaunch)
+                    ExitLauncher(silent);
             }
             else
             {
@@ -261,7 +262,14 @@ namespace SnakeBite
 
         private void labelVersion_DoubleClick(object sender, EventArgs e)
         {
-            Process.Start(Debug.LOG_FILE);
+            try
+            {
+                Process.Start(GamePaths.SBInstallDir);
+            }
+            catch
+            {
+                Debug.LogLine(String.Format("Failed to open SnakeBite Installation Directory"), Debug.LogLevel.Basic);
+            }
         }
 
         private void labelVersion_TextChanged(object sender, EventArgs e)

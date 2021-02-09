@@ -10,6 +10,7 @@ namespace SnakeBite.SetupWizard
         public FindInstallPage()
         {
             InitializeComponent();
+            if (Directory.Exists(Properties.Settings.Default.InstallPath))
                 textInstallPath.Text = Properties.Settings.Default.InstallPath;
         }
 
@@ -74,13 +75,10 @@ namespace SnakeBite.SetupWizard
             DialogResult findResult = findMGSV.ShowDialog();
             if (findResult != DialogResult.OK) return;
 
-            string filePath = Path.GetDirectoryName(findMGSV.FileName);
-            if (filePath != textInstallPath.Text)
-            {
-                textInstallPath.Text = filePath;
-                Properties.Settings.Default.InstallPath = filePath;
-                Properties.Settings.Default.Save();
-            }
+            string fileDir = Path.GetDirectoryName(findMGSV.FileName);
+            textInstallPath.Text = fileDir;
+            Properties.Settings.Default.InstallPath = fileDir;
+            Properties.Settings.Default.Save();
         }
     }
 }

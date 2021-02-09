@@ -5,42 +5,50 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using SnakeBite.ModPages;
 
 namespace SnakeBite {
     public class LogTextBoxWriter : TextWriter {
         delegate void WriteCallbackChar(char text);
         delegate void WriteCallbackString(string text);
 
-        private DateTime lastUpdate = new DateTime();
-        private int displayRate = 100;//ms
+        //private DateTime lastUpdate = new DateTime();
+        //private int displayRate = 100;//ms
 
-        private formLog logForm;
-        public LogTextBoxWriter(formLog logForm) {
-            this.logForm = logForm;
+        private LogPage logPage;
+
+        public LogTextBoxWriter(LogPage logPage) {
+            this.logPage = logPage;
         }
 
         public override void Write(char value) {                
-            logForm.logStringBuilder.Append(value);
+            logPage.logStringBuilder.Append(value);
+            logPage.UpdateLog();
 
+            /*
             var current = DateTime.Now;
             var delta = (current - lastUpdate).TotalMilliseconds;
             if (delta > displayRate)
             {
                 lastUpdate = current;
-                logForm.UpdateLog();
+                logPage.UpdateLog();
             }
+            */
         }
 
         public override void Write(string value) {
-            logForm.logStringBuilder.Append(value);
+            logPage.logStringBuilder.Append(value);
+            logPage.UpdateLog();
 
+            /*
             var current = DateTime.Now;
             var delta = (current - lastUpdate).TotalMilliseconds;
             if (delta > displayRate)
             {
                 lastUpdate = current;
-                logForm.UpdateLog();
+                logPage.UpdateLog();
             }
+            */
         }
 
         public override Encoding Encoding {

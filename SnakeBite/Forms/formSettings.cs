@@ -1,23 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Diagnostics;
-using ICSharpCode.SharpZipLib.Zip;
-using System.IO;
-using System.Xml.Serialization;
+using SnakeBite.ModPages;
 
 namespace SnakeBite
 {
     public partial class formSettings : Form
     {
         List<string> themeFiles = new List<string>() { "" };
-        SettingsManager manager = new SettingsManager(ModManager.GameDir);
+        SettingsManager manager = new SettingsManager(GamePaths.SnakeBiteSettings);
+        LogPage log = new LogPage();
+
         public formSettings()
         {
             InitializeComponent();
@@ -33,7 +27,7 @@ namespace SnakeBite
             else
             {
                 if (BackupManager.OriginalZeroOneExist()) {
-                    labelNoBackups.Text = "chunk0 backup not detected.\nCannot restore original game files.";
+                    labelNoBackups.Text = "chunk0 backup not detected.\nCannot restore backup game files.";
                     buttonRestoreOriginals.Enabled = false;
                     picModToggle.Enabled = true;
                 }
@@ -49,12 +43,17 @@ namespace SnakeBite
 
         private void buttonRestoreOriginals_Click(object sender, EventArgs e)
         {
-            var restoreData = MessageBox.Show("Your original backup files will be restored, and any SnakeBite settings and mods will be completely removed.\n\nAre you sure you want to continue?", "SnakeBite", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+            var restoreData = MessageBox.Show("Your saved backup files will be restored, and any SnakeBite settings and mods will be completely removed.\n\nAre you sure you want to continue?", "SnakeBite", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
             if (restoreData != DialogResult.Yes) return;
 
-                BackupManager.RestoreOriginals();
+            BackupManager.RestoreOriginals();
+            try
+            {
                 manager.DeleteSettings();
-                Application.Exit();
+                MessageBox.Show("Backups restored. SnakeBite will now close.", "SnakeBite", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch { }
+            Application.Exit();
         }
 
         private void UpdateModToggle()
@@ -77,14 +76,14 @@ namespace SnakeBite
         {
             SetupWizard.SetupWizard setupWizard = new SetupWizard.SetupWizard();
             setupWizard.Tag = "closable";
-            setupWizard.ShowDialog();
+            setupWizard.ShowDialog(Application.OpenForms[0]);
             UpdateModToggle();
             CheckBackupState();
         }
 
-        private void linkGithub_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        private void linkNexusLink_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            Process.Start(this.labelGithub.Text);
+            Process.Start(labelNexusLink.Text);
         }
 
         private void buttonFindMGSV_Click(object sender, EventArgs e)
@@ -111,11 +110,13 @@ namespace SnakeBite
             // Set installation path textbox
             textInstallPath.Text = Properties.Settings.Default.InstallPath;
             checkEnableSound.Checked = Properties.Settings.Default.EnableSound;
-            listThemes.SelectedIndex = 0;
+            checkBoxSaveRevertPreset.Checked = Properties.Settings.Default.AutosaveRevertPreset;
+            checkBoxCloseOnStart.Checked = Properties.Settings.Default.CloseSnakeBiteOnLaunch;
+            //listThemes.SelectedIndex = 0;
             UpdateModToggle();
             CheckBackupState();
             
-
+            /*
             if (Directory.Exists("Themes"))
             {
                 foreach(string file in Directory.GetFiles("Themes", "*.sbtheme"))
@@ -140,6 +141,7 @@ namespace SnakeBite
             {
                 tabControl.TabPages.RemoveAt(1);
             }
+            */
         }
 
         private void checkEnableSound_CheckedChanged(object sender, EventArgs e)
@@ -148,32 +150,45 @@ namespace SnakeBite
             Properties.Settings.Default.Save();
         }
 
+        private void checkBoxSaveRevertPreset_CheckedChanged(object sender, EventArgs e)
+        {
+            Properties.Settings.Default.AutosaveRevertPreset = checkBoxSaveRevertPreset.Checked;
+            Properties.Settings.Default.Save();
+        }
+
+        /*
         private void buttonSetTheme_Click(object sender, EventArgs e)
         {
             Properties.Settings.Default.ThemeFile = themeFiles[listThemes.SelectedIndex];
             Properties.Settings.Default.Save();
 
-            var o = this.Owner as formLauncher;
+            var o = Owner as formLauncher;
             o.SetupTheme();
             o.Refresh();
         }
+        */
 
-        private void buttonOpenLog_Click(object sender, EventArgs e) {
-            Process.Start(Debug.LOG_FILE_PREV);
-            Process.Start(Debug.LOG_FILE);
+        private void buttonOpenLogDir_Click(object sender, EventArgs e) {
+            Debug.OpenLogDirectory();
         }
 
         private void picModToggle_Click(object sender, EventArgs e)
         {
             if (BackupManager.ModsDisabled())
             {
-                ProgressWindow.Show("Working", "Enabling mods, please wait...", new Action(BackupManager.SwitchToMods));
+                ProgressWindow.Show("Working", "Enabling mods, please wait...", new Action(BackupManager.SwitchToMods), log);
             }
             else
             {
-                ProgressWindow.Show("Working", "Disabling mods, please wait...\n\nNote:\n You will not have access to the Mod Menu\nwhile mods are disabled.", new Action(BackupManager.SwitchToOriginal));
+                ProgressWindow.Show("Working", "Disabling mods, please wait...", new Action(BackupManager.SwitchToOriginal), log);
             }
             UpdateModToggle();
+        }
+
+        private void checkBoxCloseOnStart_CheckedChanged(object sender, EventArgs e)
+        {
+            Properties.Settings.Default.CloseSnakeBiteOnLaunch = checkBoxCloseOnStart.Checked;
+            Properties.Settings.Default.Save();
         }
     }
 }

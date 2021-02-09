@@ -6,6 +6,8 @@ using System.Text;
 using ICSharpCode.SharpZipLib.Zip;
 using System.Xml.Serialization;
 using System.Collections;
+using System;
+using System.Threading;
 
 namespace SnakeBite
 {
@@ -181,7 +183,7 @@ namespace SnakeBite
             catch { return null; }
 
         }
-
+        
         public static string ToWinPath(string Path)
         {
             return Path.Replace("/", "\\").TrimStart('\\');
@@ -252,6 +254,77 @@ namespace SnakeBite
             string ext = FilePath.Substring(FilePath.IndexOf(".") + 1);
             if (DatFileExtensions.Contains(ext)) return true;
             return false;
+        }
+
+        public static void DeleteDirectory(string target_dir)
+        {
+            //Debug.LogLine("[Cleanup Debug] Removing " + target_dir);
+            foreach (string file in Directory.EnumerateFiles(target_dir))
+            {
+                //Debug.LogLine("[Cleanup Debug] Setting FileAttributes for " + file);
+                File.SetAttributes(file, FileAttributes.Normal);
+                //Debug.LogLine("[Cleanup Debug] Deleting " + file);
+                File.Delete(file);
+            }
+            foreach (string dir in Directory.EnumerateDirectories(target_dir))
+            {
+                //Debug.LogLine("[Cleanup Debug] Deleting " + dir);
+                DeleteDirectory(dir);
+            }
+
+            //Debug.LogLine("[Cleanup Debug] Deleting " + target_dir);
+            DirectoryInfo target = new DirectoryInfo(target_dir);
+            if (target.GetFiles().Length == 0)
+                Directory.Delete(target_dir, true);
+            else
+            {
+                Thread.Sleep(50);
+                DeleteDirectory(target_dir);
+            }
+        }
+
+        public static void DirectoryCopy(string sourceDirName, string destDirName, bool copySubDirs)
+        {
+            // Get the subdirectories for the specified directory.
+            DirectoryInfo dir = new DirectoryInfo(sourceDirName);
+            if (dir.Exists)
+            {
+                DirectoryInfo[] dirs = dir.GetDirectories();
+                // If the destination directory doesn't exist, create it.
+                if (!Directory.Exists(destDirName))
+                {
+                    Directory.CreateDirectory(destDirName);
+                }
+
+                // Get the files in the directory and copy them to the new location.
+                FileInfo[] files = dir.GetFiles();
+                foreach (FileInfo file in files)
+                {
+                    string temppath = Path.Combine(destDirName, file.Name);
+                    file.CopyTo(temppath, true);
+                }
+
+                // If copying subdirectories, copy them and their contents to new location.
+                if (copySubDirs)
+                {
+                    foreach (DirectoryInfo subdir in dirs)
+                    {
+                        string temppath = Path.Combine(destDirName, subdir.Name);
+                        DirectoryCopy(subdir.FullName, temppath, copySubDirs);
+                    }
+                }
+            }
+        }
+
+        public static string GetFileSizeKB(params string[] filePaths)
+        {
+            long size = 0;
+            foreach(string filePath in filePaths)
+            {
+                size += new FileInfo(filePath).Length;
+            }
+
+            return string.Format("{0:n0}", size / 1024);
         }
     }
 }

@@ -35,8 +35,8 @@ namespace makebite
             // unpack existing fpks if extracted folders don't exist
             foreach (string fpkFile in Directory.GetFiles(modPath, "*.fpk*", SearchOption.AllDirectories))
             {
-                //tex chunk0\Assets\tpp\pack\collectible\common\col_common_tpp_fpk\Assets\tpp\pack\resident\resident00.fpkl is the only fpkl, don't know what a fpkl is, but gzcore crashes on it.
-                if (fpkFile.Contains(".fpkl")) {
+                //tex chunk0\Assets\tpp\pack\collectible\common\col_common_tpp_fpk\Assets\tpp\pack\resident\resident00.fpkl is the only fpkl, don't know what a fpkl is, but gzcore crashes on it. also checks for xml in case user opened the fpk with gzstool and produced a xml file
+                if (fpkFile.EndsWith(".fpkl") || fpkFile.EndsWith(".xml")) {
                     continue;
                 }
 
@@ -96,7 +96,7 @@ namespace makebite
         private void buttonBuild_Click(object sender, EventArgs e)
         {
             SaveFileDialog saveMod = new SaveFileDialog();
-            saveMod.Filter = "MGSV Mod|*.mgsv";
+            saveMod.Filter = "MGSV Mod File|*.mgsv";
             DialogResult saveResult = saveMod.ShowDialog();
             if (saveResult != DialogResult.OK) return;
 
