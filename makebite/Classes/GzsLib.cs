@@ -14,8 +14,8 @@ namespace SnakeBite.GzsTool
     public static class GzsLib
     {
         //GAMEVERSION: qar flags, should be updated to games flags (use gzstool on unmodded .dat and check flags)
-        public static uint zeroFlags = 3146208;
-        public static uint oneFlags = 3145952;
+        public static uint zeroFlags = 3150304;
+        public static uint oneFlags = 3150048;
         public static uint chunk0Flags = 3146208;
         public static uint chunk7Flags = 3146208;
         public static uint texture7Flags = 3150048;

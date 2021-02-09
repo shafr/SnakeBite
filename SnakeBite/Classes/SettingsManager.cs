@@ -11,13 +11,15 @@ namespace SnakeBite
     
     public class SettingsManager
     {
-        internal static string vanillaDatHash = "0E96B2AF0BE0F456CC0BB81A964F9405B6905D4A97F8A9750B6CC2B97B6BE218"; //expected original hash for 1.0.15.1
-        internal static Version IntendedGameVersion = new Version(1, 0, 15, 1); // GAMEVERSION
+        // GAMEVERSION > You will have to update everything here when the game updates, search for GAMEVERSION to find other areas than need to be updated
+        internal static string vanillaDatHash = "36DCF52AD8EE498F6FCF529976D7C8E11240EF2F06D9D193851C5AE45D8D46BF"; //expected original hash for 1.0.15.2 // To generate this run snakebite and toggle mods off, then look for the latest '[UpdateDatHash] Updated 00/01 dat hash to' in the log or grab it from the snakebite.xml
+        internal static Version IntendedGameVersion = new Version(1, 0, 15, 2);
 
-        internal const int MAXZEROSIZE = 495880000; // ballpark estimates of vanilla archive filesizes
-        internal const int MINZEROSIZE = 495860000;
-        internal const int MAXONESIZE = 264930000;
-        internal const int MINONESIZE = 264910000;
+        internal const int MAXZEROSIZE = 496340000; // ballpark estimates of vanilla archive filesizes. max/min by 10k? morbid do you want to document your reasoning on this?
+        internal const int MINZEROSIZE = 496320000;
+        internal const int MAXONESIZE = 264940000;
+        internal const int MINONESIZE = 264920000;
+        // GAMEVERSION <
 
         public string xmlFilePath;
 
@@ -266,7 +268,7 @@ namespace SnakeBite
         public bool IsUpToDate(Version ModVersion) //shouldn't be in settingsmanager
         {
             bool isUpToDate = ModManager.GetMGSVersion() == ModVersion;
-            bool isSpecialCase = ModVersion == new Version(0, 0, 0, 0) || ModVersion == new Version(1, 0, 14, 0) || ModVersion == new Version(1,0,15,1); // 1.0.14.0 and 1.0.15.1 mods are still up to date
+            bool isSpecialCase = ModVersion == new Version(0, 0, 0, 0) || ModVersion == new Version(1, 0, 14, 0) || ModVersion == new Version(1,0,15,1); // GAMEVERSION 1.0.14.0 and 1.0.15.1 mods are still up to date TODO: make judgement on 1.0.15.2, safest would be to make it a required update (remove 14.0,15.1 from special case)
             return isUpToDate || isSpecialCase;
         }
 
