@@ -1,0 +1,20 @@
+A number of variables need to be updated in snakebite when mgsv is updated.
+
+Search for 'GAMEVERSION' and read the notes.
+
+Roughly its:
+Makebite:
+GzsLib - qar flags
+Build - MGSVVersionStr
+
+Snakebite:
+GzsLib - qar flags
+SettingManager - static vars for dat hash, version, dat sizes
+IsUpToDate isSpecialCase - manages whether older mod versions should be let through (for game updates where the dats didn't really change)
+
+Making a build:
+TODO document the process of making a release build
+Snakebite uses NSIS to install:
+https://nsis.sourceforge.io/Download
+
+You'll see the SnakeBite.nsi in the github repos root. 
