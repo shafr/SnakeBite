@@ -82,6 +82,7 @@ Section "SnakeBite" SecMain
   File "fpk_dictionary.txt"
   File "qar_dictionary.txt"
   File "README.md"
+  File "ChangeLog.txt"
   File "mgsvfile.ico"
   File "mgsvpreset.ico"
   
