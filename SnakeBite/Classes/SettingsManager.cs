@@ -268,7 +268,7 @@ namespace SnakeBite
         public bool IsUpToDate(Version ModVersion) //shouldn't be in settingsmanager
         {
             bool isUpToDate = ModManager.GetMGSVersion() == ModVersion;
-            bool isSpecialCase = ModVersion == new Version(0, 0, 0, 0) || ModVersion == new Version(1, 0, 14, 0) || ModVersion == new Version(1,0,15,1); // GAMEVERSION 1.0.14.0 and 1.0.15.1 mods are still up to date TODO: make judgement on 1.0.15.2, safest would be to make it a required update (remove 14.0,15.1 from special case)
+            bool isSpecialCase = ModVersion == new Version(0, 0, 0, 0); //REF || ModVersion == new Version(1, 0, 14, 0) || ModVersion == new Version(1,0,15,1); // GAMEVERSION 
             return isUpToDate || isSpecialCase;
         }
 
