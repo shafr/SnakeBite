@@ -1,14 +1,56 @@
 Changelog
+0.9.1.6
+SnakeBite:
+Bugfix (more like a band-aide): "Length cannot be less than 0" exception. Simply removes the _unknown file that causes the error, so the archive can recompile. Doesn't fix the root issue of where the _unknown file stems from.
+New Windows icons for .mgsv and .mgsvpreset files. (Thank you Muffins for the suggestion)
+All .mgsv/.mgsvpreset files should now open as a compressed file without renaming the extension or using "Open With..." if the setup is run as an Admin.
+Updated SnakeBite icon to scale better on different displays. (Icon Courtesy of OldBoss)
+
+Makebite:
+Bugfix for clearing "_build" files while building the mod archives.
+New Windows icon.
+Minor aesthetic tweaks to emphasize the Formatting Help menu and clarify the "Build Mod" button
+
+0.9.1.5
+Incremental update to coordinate with Game Version 1.0.15.1 Update.
+
+0.9.1.4
+SnakeBite: 
+Bugfix: Removed animated processing wheel image from setup to fix an issue that caused the startup wizard to fail.
+Bugfix: Redesigned file cleanup process to fix freezing for some users during the modify foxfs step of the setup wizard.
+Bugfix: Added logic to delete external files when restoring backups via the settings menu
+More exception handling added when uninstalling mods containing external files.
+SnakeBite and Makebite now save up to 3 previous debug logs (instead of only one).
+Added option to keep SnakeBite open after launching the game
+Improved logging interface to display the current process more accurately and with greater detail.
+
+0.9.1.3
+snakebite bugfixes: Loading MGSVPresets will remove any existing GameDir files. 
+Tweaked the folder cleanup process to (hopefully) keep the installer from freezing up.
+Added more exception handling to the setup process for more debug log details
+qar_dictionary update from TinManTex's mgsv-lookup-strings
+
+0.9.1.2
+makebite bugfix: _fpk folders are packed and included into the makebite build
+
+0.9.1.1
+minor bugfixes:
+makebite will no longer allow users to pack an unhashed file/folder if the unhashed file already exists in the makebite directory.
+snakebite's mod form will reset its screen position if the top-left of the form is off the screen.
+
 0.9.1.0
 Unified qar flags to static in GzsLib.
 00.dat work folder changed from _working1 to _working0, likewise 01.dat from _working2 to _working1.
 InstallMod and UninstallMod broken into smaller functions.
-GameData - now priority ordered by qar, indexed by hash, includes chunk5_mgo0/cunk6_gz0. Knocks about 30s off IH install time on my machine.
+GameData - now priority ordered by qar, indexed by hash, includes chunk5_mgo0/chunk6_gz0. Knocks about 30s off IH install time on my machine.
 Re enabled commented out log window, added lock on write fixed prior issue and after removing logspam (coupled with other snakebite optimisations) I'm happy enough that the feedback it provides is better than the performance it takes.
 Removed some more remnants of sbupdater from project.
 Command line installs all .mgsvs if install path arg is a directory.
 Added -c commandline to skip collision checks
 More user feedback on longer setupwizard processes.
+Some UI changes including a menulist on the main mod page and mod page resizing
+More error handling and file safety
+Added .MGSVPreset capabilities to save and load mod presets
 
 0.9.0.0
 Makebite/Snakebite:
