@@ -12,9 +12,9 @@ GzsLib - qar flags
 SettingManager - static vars for dat hash, version, dat sizes
 IsUpToDate isSpecialCase - manages whether older mod versions should be let through (for game updates where the dats didn't really change)
 
-Making a build:
-TODO document the process of making a release build
-Snakebite uses NSIS to install:
+Making an installer build:
+Snakebite uses NSIS create the installer:
 https://nsis.sourceforge.io/Download
 
-You'll see the SnakeBite.nsi in the github repos root. 
+The build process copies the required files to (SolutionDir)\installerbuild. 
+Make sure you've done a release build then right click the snakebite.nsi in that folder and choose 'Compile NISI script'
