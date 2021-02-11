@@ -1,5 +1,9 @@
 Changelog
 0.9.1.6
+SnakeBite/MakeBite:
+Gameversion update to 1.0.15.2
+
+0.9.1.6
 SnakeBite:
 Bugfix (more like a band-aide): "Length cannot be less than 0" exception. Simply removes the _unknown file that causes the error, so the archive can recompile. Doesn't fix the root issue of where the _unknown file stems from.
 New Windows icons for .mgsv and .mgsvpreset files. (Thank you Muffins for the suggestion)
