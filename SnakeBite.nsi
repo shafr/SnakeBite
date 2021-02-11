@@ -72,7 +72,7 @@ Section "SnakeBite" SecMain
 
   SetOutPath "$INSTDIR"
   
-  ;ADD YOUR OWN FILES HERE...
+  ;ADD YOUR OWN FILES HERE..., dont forget to update uninstall too
   File "SnakeBite.exe"
   File "MakeBite.exe"
   File "CityHash.dll"
@@ -193,7 +193,10 @@ Section "Uninstall"
   Delete "$INSTDIR\Zlib.Portable.dll"
   Delete "$INSTDIR\fpk_dictionary.txt"
   Delete "$INSTDIR\qar_dictionary.txt"
-  Delete "$INSTDIR\sbupdater.exe"
+  Delete "$INSTDIR\README.md"
+  Delete "$INSTDIR\ChangeLog.txt"
+  Delete "$INSTDIR\mgsvfile.ico"
+  Delete "$INSTDIR\mgsvpreset.ico"
 
   Delete "$INSTDIR\Uninstall.exe"
 
@@ -203,6 +206,7 @@ Section "Uninstall"
   Delete "$DESKTOP\SnakeBite.lnk"
   Delete "$DESKTOP\MakeBite.lnk"
   Delete "$SMPROGRAMS\$StartMenuFolder\SnakeBite.lnk"
+  Delete "$SMPROGRAMS\$StartMenuFolder\MakeBite.lnk"
   Delete "$SMPROGRAMS\$StartMenuFolder\Uninstall.lnk"
   RMDir "$SMPROGRAMS\$StartMenuFolder"
 
