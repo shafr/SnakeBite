@@ -6,6 +6,8 @@ using System.Security.Cryptography;
 using System.Text;
 using ICSharpCode.SharpZipLib.Zip;
 using System.Xml.Serialization;
+using System.Collections;
+using System;
 using System.Threading;
 
 namespace SnakeBite
@@ -251,7 +253,7 @@ namespace SnakeBite
 
         internal static bool IsValidFile(string FilePath)
         {
-            string ext = Path.GetExtension(FilePath).Substring(1);
+            string ext = FilePath.Substring(FilePath.IndexOf(".") + 1);
             if (DatFileExtensions.Contains(ext)) return true;
             return false;
         }
