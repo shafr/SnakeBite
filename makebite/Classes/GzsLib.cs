@@ -438,11 +438,15 @@ namespace SnakeBite.GzsTool
         }
 #endif
         // Export FPK archive with specified parameters
-        public static void WriteFpkArchive(FpkType FpkType, string FileName, string SourceDirectory, List<string> Files)
+        public static void WriteFpkArchive(string FileName, string SourceDirectory, List<string> Files)
         {
             Debug.LogLine(String.Format("[GzsLib] Writing FPK archive: {0}", FileName));
-            FpkFile q = new FpkFile() { Name = FileName, FpkType = FpkType };
-            foreach (string s in Files)
+
+            string fpkType = FileName.EndsWith(".fpkd") ? "fpkd" : "fpk";
+            List<string> fpkFilesSorted = SortFpksFiles(fpkType, Files);
+
+            FpkFile q = new FpkFile() { Name = FileName, FpkType = (fpkType == "fpkd" ? FpkType.Fpkd : FpkType.Fpk) };
+            foreach (string s in fpkFilesSorted)
             {
                 q.Entries.Add(new FpkEntry() { FilePath = Tools.ToQarPath(s) });
             }

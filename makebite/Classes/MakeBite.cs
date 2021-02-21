@@ -151,7 +151,7 @@ namespace makebite
             string FpkBuildFolder = FpkFolder.Substring(0, FpkFolder.TrimEnd('\\').LastIndexOf("\\"));
             //string FpkXmlFile = FpkBuildFolder + "\\" + FpkName + ".xml";
             string FpkFile = FpkBuildFolder + "\\" + FpkName;
-            string fpkType = FpkFolder.Substring(FpkFolder.LastIndexOf("_") + 1);
+            string FpkType = FpkFolder.Substring(FpkFolder.LastIndexOf("_") + 1);
 
             List<string> fpkFiles = new List<string>();
 
@@ -174,10 +174,7 @@ namespace makebite
                 fpkFiles.Add(inQarName);
             }
 
-            List<string> fpkFilesSorted = GzsLib.SortFpksFiles(fpkType, fpkFiles);
-
-            FpkType fpkFileType = fpkType == "Fpk" ? FpkType.Fpk : FpkType.Fpkd;
-            GzsLib.WriteFpkArchive(fpkFileType, FpkFile, FpkFolder, fpkFilesSorted);
+            GzsLib.WriteFpkArchive(FpkType, FpkFile, FpkFolder, fpkFiles);
 
             return fpkList;
         }
