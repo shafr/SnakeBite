@@ -125,16 +125,24 @@ namespace SnakeBite.GzsTool
             }},
         };
 
+        static Dictionary<string, string> extensionToType = new Dictionary<string, string> {
+            {"dat", "QarFile"},
+            {"fpk", "FpkFile" },
+            {"fpkd", "FpkFile" },
+        };
+
         // Extract full archive
         public static List<string> ExtractArchive<T>(string FileName, string OutputPath) where T : ArchiveFile, new()
         {
-            Debug.LogLine(String.Format("[GzsLib] Extracting archive {0} to {1}", FileName, OutputPath));
-
             if (!File.Exists(FileName))
             {
-                Debug.LogLine("[GzsLib] File not found");
+                Debug.LogLine($"[GzsLib] File not found: {FileName}");
                 throw new FileNotFoundException();
             }
+            else
+            {
+                string name = Path.GetFileName(FileName);
+                Debug.LogLine($"[GzsLib] Extracting {name} to {OutputPath} ({Tools.GetFileSizeKB(FileName)} KB)");
 
             using (FileStream archiveFile = new FileStream(FileName, FileMode.Open))
             {
@@ -157,20 +165,23 @@ namespace SnakeBite.GzsTool
                         outFiles.Add(v.FileName);
                     }
                 }
-                Debug.LogLine(String.Format("[GzsLib] Extracted {0} files", outFiles.Count));
+                    Debug.LogLine($"[GzsLib] Extracted {outFiles.Count} files from {name}");
                 return outFiles;
             }
+        }
         }
 
         // Extract single file from archive
         public static bool ExtractFile<T>(string SourceArchive, string FilePath, string OutputFile) where T : ArchiveFile, new()
         {
-            Debug.LogLine(String.Format("[GzsLib] Extracting file {1}: {0} -> {2}", FilePath, SourceArchive, OutputFile));
             if (!File.Exists(SourceArchive))
             {
-                Debug.LogLine("[GzsLib] File not found");
+                Debug.LogLine($"[GzsLib] File not found: {SourceArchive}");
                 throw new FileNotFoundException();
             }
+            else
+            {
+                Debug.LogLine(String.Format("[GzsLib] Extracting file {1}: {0} -> {2}", FilePath, SourceArchive, OutputFile));
             // Get file hash from path
             ulong fileHash = Tools.NameToHash(FilePath);
 
@@ -193,7 +204,8 @@ namespace SnakeBite.GzsTool
                         outFile.DataStream().CopyTo(outStream);
                     }
                     return true;
-                } else
+                    }
+                    else
                 {
                     // file not found
                     return false;
@@ -201,16 +213,19 @@ namespace SnakeBite.GzsTool
             }
         }
 
+        }
+
         // Extract single file from archive
         public static bool ExtractFileByHash<T>(string SourceArchive, ulong FileHash, string OutputFile) where T : ArchiveFile, new()
         {
-            Debug.LogLine(String.Format("[GzsLib] Extracting file from {1}: hash {0} -> {2}", FileHash, SourceArchive, OutputFile));
             if (!File.Exists(SourceArchive))
             {
-                Debug.LogLine("[GzsLib] File not found");
+                Debug.LogLine($"[GzsLib] File not found: {SourceArchive}");
                 throw new FileNotFoundException();
             }
-
+            else
+            {
+                Debug.LogLine(String.Format("[GzsLib] Extracting file from {1}: hash {0} -> {2}", FileHash, SourceArchive, OutputFile));
             // Get file hash from path
             ulong fileHash = FileHash;
 
@@ -232,7 +247,8 @@ namespace SnakeBite.GzsTool
                         outFile.DataStream().CopyTo(outStream);
                     }
                     return true;
-                } else
+                    }
+                    else
                 {
                     // file not found
                     return false;
@@ -240,16 +256,20 @@ namespace SnakeBite.GzsTool
             }
         }
 
+        }
+
         // Read file hashes contained within QAR archive
         public static List<GameFile> ListArchiveHashes<T>(string ArchiveName) where T : ArchiveFile, new()
         {
-            Debug.LogLine(String.Format("[GzsLib] Reading archive contents: {0}", ArchiveName));
             if (!File.Exists(ArchiveName))
             {
-                Debug.LogLine("[GzsLib] File not found");
+                Debug.LogLine($"[GzsLib] File not found: {ArchiveName}");
                 throw new FileNotFoundException();
             }
-
+            else
+            {
+                string name = Path.GetFileName(ArchiveName);
+                Debug.LogLine($"[GzsLib] Reading archive contents: {name} ({Tools.GetFileSizeKB(ArchiveName)} KB)");
             using (FileStream archiveFile = new FileStream(ArchiveName, FileMode.Open))
             {
                 List<GameFile> archiveContents = new List<GameFile>();
@@ -263,6 +283,7 @@ namespace SnakeBite.GzsTool
                 return archiveContents;
             }
         }
+        }
 
         /// <summary>
         /// return gamefiles by hash for given qar
@@ -270,13 +291,15 @@ namespace SnakeBite.GzsTool
         /// </summary>
         public static Dictionary<ulong, GameFile> GetQarGameFiles(string qarPath)
         {
-            Debug.LogLine($"[GzsLib] Reading archive contents: {qarPath}");
             if (!File.Exists(qarPath))
             {
-                Debug.LogLine("[GzsLib] File not found");
+                Debug.LogLine($"[GzsLib] File not found: {qarPath}");
                 throw new FileNotFoundException();
             }
-
+            else
+            {
+                string name = Path.GetFileName(qarPath);
+                Debug.LogLine($"[GzsLib] Reading archive contents: {name}");
             using (FileStream archiveFile = new FileStream(qarPath, FileMode.Open))
             {
                 var qarFiles = new Dictionary<ulong, GameFile>();
@@ -290,6 +313,7 @@ namespace SnakeBite.GzsTool
                 return qarFiles;
             }
         }
+        }
 
 
         /// <summary>
@@ -300,13 +324,15 @@ namespace SnakeBite.GzsTool
         /// <returns>list of files within archive</returns>
         public static List<string> ListArchiveContents<T>(string ArchiveName) where T : ArchiveFile, new()
         {
-            Debug.LogLine(String.Format("[GzsLib] Reading archive contents: {0}", ArchiveName));
             if (!File.Exists(ArchiveName))
             {
-                Debug.LogLine("[GzsLib] File not found");
+                Debug.LogLine($"[GzsLib] File not found: {ArchiveName}");
                 throw new FileNotFoundException();
             }
-
+            else
+            {
+                string name = Path.GetFileName(ArchiveName);
+                Debug.LogLine($"[GzsLib] Reading archive contents: {name}");
             using (FileStream archiveFile = new FileStream(ArchiveName, FileMode.Open))
             {
                 List<string> archiveContents = new List<string>();
@@ -320,6 +346,7 @@ namespace SnakeBite.GzsTool
                 return archiveContents;
             }
         }
+        }
 
         /// <summary>
         /// Load filename dictionaries into Hashing
@@ -329,6 +356,7 @@ namespace SnakeBite.GzsTool
             Debug.LogLine("[GzsLib] Loading base dictionaries");
             Hashing.ReadDictionary("qar_dictionary.txt");
             Hashing.ReadMd5Dictionary("fpk_dictionary.txt");
+            HashingExtended.ReadDictionary();
 
 #if SNAKEBITE
             LoadModDictionaries();
@@ -378,7 +406,7 @@ namespace SnakeBite.GzsTool
             Debug.LogLine("[GzsLib] Acquiring base game data");
 
             var baseDataFiles = new List<Dictionary<ulong, GameFile>>();
-            string dataDir = Path.Combine(GamePaths.SnakeBiteSettings, "master");
+            string dataDir = Path.Combine(GamePaths.GameDir, "master");
 
             //in priority order SYNC with or read foxfs.dat directly
             var qarFileNames = new List<string> {
@@ -429,10 +457,11 @@ namespace SnakeBite.GzsTool
         // Export QAR archive with specified parameters
         public static void WriteQarArchive(string FileName, string SourceDirectory, List<string> Files, uint Flags)
         {
-            Debug.LogLine(String.Format("[GzsLib] Writing QAR archive: {0}", FileName));
+            Debug.LogLine($"[GzsLib] Writing {Path.GetFileName(FileName)}");
             List<QarEntry> qarEntries = new List<QarEntry>();
             foreach (string s in Files)
             {
+                if (s.EndsWith("_unknown")) { continue; }//DEBUGNOW document what this is
                 qarEntries.Add(new QarEntry() { FilePath = s, Hash = Tools.NameToHash(s), Compressed = (Path.GetExtension(s).EndsWith(".fpk") || Path.GetExtension(s).EndsWith(".fpkd")) ? true : false });
             }
 
@@ -442,6 +471,20 @@ namespace SnakeBite.GzsTool
             {
                 IDirectory fileDirectory = new FileSystemDirectory(SourceDirectory);
                 q.Write(outFile, fileDirectory);
+            }
+        }
+
+        public static void PromoteQarArchive(string sourcePath, string destinationPath)
+        {
+            if (File.Exists(sourcePath))
+            {
+                Debug.LogLine($"[GzsLib] Promoting {Path.GetFileName(sourcePath)} to {Path.GetFileName(destinationPath)} ({Tools.GetFileSizeKB(sourcePath)} KB)");
+                File.Delete(destinationPath);
+                File.Move(sourcePath, destinationPath);
+            }
+            else
+            {
+                Debug.LogLine($"[GzsLib] {sourcePath} not found");
             }
         }
 
@@ -506,13 +549,10 @@ namespace SnakeBite.GzsTool
             return fpkFilesSorted;
         }// SortFpksFiles
 
-
         public static bool IsExtensionValidForArchive(string fileName, string archiveName)
         {
             var archiveExtension = Path.GetExtension(archiveName).TrimStart('.');
-
             var validExtensions = archiveExtensions[archiveExtension];
-
             var ext = Path.GetExtension(fileName).TrimStart('.');
             bool isValid = false;
             foreach (var validExt in validExtensions)
@@ -523,12 +563,10 @@ namespace SnakeBite.GzsTool
                     break;
                 }
             }
-
             if (!isValid)
             {
                 return false;
             }
-
             return true;
         }
     }

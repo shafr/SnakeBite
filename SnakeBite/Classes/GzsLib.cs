@@ -96,11 +96,13 @@ namespace SnakeBite.GzsTool
                 "uigb",
                 "uilb",
             }},
-            //tex in wort order (see SortFpksFiles) 
-              //tex all positions reletively solid except for "bnd", analysis from my ExtensionOrder.lua puts it somewhere between veh and tgt.
+            //tex in fpkd extension sort order (see SortFpksFiles) 
+            //tex derived by an incomplete analysis of vanilla fpkds 
+            //all positions reletively solid except for "bnd", analysis from my ExtensionOrder.lua puts it somewhere between veh and tgt.
             //have put it between des and tgt in line with init.lua RegisterPackageExtensionInfo call
             // RegisterPackageExtensionInfo call seems to mostly match my derived order in reverse - however clo doesnt fit the order and lng isn't in its table.
             //previously file type order wasn't actually currently being handled by snakebite. The issue has been avoided so far by new fpkds not being merged with anything and merges with game fpkds being replacements rather than additions. 
+            //Actual load order of files might be reversed however, given how files in extension groups are alpha descending but (if evidence from lua load order applies to all) are loaded acending
               {"fpkd",new List<string> {
                 "fox2",
                 "evf",
@@ -147,7 +149,7 @@ namespace SnakeBite.GzsTool
                 {
                     List<string> outFiles = new List<string>();
                     T archive = new T();
-                    archive.Name = name;
+                archive.Name = Path.GetFileName(FileName);
                     archive.Read(archiveFile);
 
                     // Extract all files
@@ -273,7 +275,7 @@ namespace SnakeBite.GzsTool
                 {
                     List<GameFile> archiveContents = new List<GameFile>();
                     T archive = new T();
-                    archive.Name = name;
+                archive.Name = Path.GetFileName(ArchiveName);
                     archive.Read(archiveFile);
                     foreach (var x in archive.ExportFiles(archiveFile))
                     {
@@ -303,7 +305,7 @@ namespace SnakeBite.GzsTool
                 {
                     var qarFiles = new Dictionary<ulong, GameFile>();
                     var qarFile = new QarFile();
-                    qarFile.Name = name;
+                qarFile.Name = Path.GetFileName(qarPath);
                     qarFile.Read(archiveFile);
                     foreach (QarEntry entry in qarFile.Entries)
                     {
@@ -336,7 +338,7 @@ namespace SnakeBite.GzsTool
                 {
                     List<string> archiveContents = new List<string>();
                     T archive = new T();
-                    archive.Name = name;
+                archive.Name = Path.GetFileName(ArchiveName);
                     archive.Read(archiveFile);
                     foreach (var x in archive.ExportFiles(archiveFile))
                     {
@@ -460,7 +462,7 @@ namespace SnakeBite.GzsTool
             List<QarEntry> qarEntries = new List<QarEntry>();
             foreach (string s in Files)
             {
-                if (s.EndsWith("_unknown")) { continue; }
+                if (s.EndsWith("_unknown")) { continue; }//DEBUGNOW document what this is
                 qarEntries.Add(new QarEntry() { FilePath = s, Hash = Tools.NameToHash(s), Compressed = (Path.GetExtension(s).EndsWith(".fpk") || Path.GetExtension(s).EndsWith(".fpkd")) ? true : false });
             }
 
@@ -489,17 +491,22 @@ namespace SnakeBite.GzsTool
 
         //SYNC: makebite
         //tex fpkds seem to require a specific order to their files.
+        //Don't know whether this is also an issue for fpks, or other archives (are there any other archives with multiple filetypes?)
         //Reproduction: Extract an unmodified fpkd (such as chunk0_dat\Assets\tpp\pack\mission2\init\init.fpkd, as it's loaded automatically and early) DEBUGNOW redo this test to confirm issue again
         //change the order of the file entries in the .fpkd.xml so that they're not grouped by extension
         //repack and the load the game
         //game will fail to load
         //as the issue doesn't seem to happen when there are no fox2s in fpkd VERIFY
         //it might simply be that the first entries must be fox2s?
+        //Furthermore, entries are also sorted alphanumeric descending (though not sure the exact type of alpha sort kjp used), but (lua at the very least) loaded in alpha ascending (reversed list)
+        //Reproduction: have two lua files, one referencing the other (or rather a field of the other ie somescript.somevar) directly in its load time script (ie not hidden in a function) - (this also suggests that lua files are just loaded to fpkd order rather than having a load order specified anywhere) DEBUGNOW actually test lol
+        //Or just hook luaL_loadbuffer and see the load order for a vanilla file.
+        //GOTCHA: This mean there's a currently unresolved (unresolvable?) problem of mixing in hashed entries as you can't know their position. Though that's only an issue for GZ fpks? (and s/makebite isn't for gz)
         public static List<string> SortFpksFiles(string FpkType, List<string> fpkFiles)
         {
             List<string> fpkdExtensionsOrder = archiveExtensions[FpkType];
 
-            List<string> fpkFilesSorted = fpkFiles.OrderBy(fileName => Path.GetExtension(fileName)).ThenBy(fileName => fileName).ToList();
+            List<string> fpkFilesSorted = fpkFiles.OrderBy(fileName => Path.GetExtension(fileName)).ThenByDescending(fileName => fileName).ToList();
             Dictionary<string, List<string>> filesByExtension = new Dictionary<string, List<string>>();
 
             if (fpkFilesSorted.Count() > 1)
@@ -519,10 +526,10 @@ namespace SnakeBite.GzsTool
                         extensionFiles.Add(fileName);
                     }
 
-                    //tex sorting by alphabetical just 'cause. I don't know if there's supposed to be some order within extension groupings.
+                    //tex sorted by alpha descending as per vanilla, GOTCHA: but not sure what acual alpha sort kjp used 
                     foreach (KeyValuePair<string, List<string>> entry in filesByExtension)
                     {
-                        entry.Value.Sort();
+                        entry.Value.Sort((a, b) => b.CompareTo(a));
                     }
 
                     fpkFilesSorted = new List<string>();
@@ -538,8 +545,8 @@ namespace SnakeBite.GzsTool
                             }
                         }
                     }
-                }
-            }
+                }//if FpkType == "fpkd"
+            }//if fpkFilesSorted.Count
             return fpkFilesSorted;
         }// SortFpksFiles
         
