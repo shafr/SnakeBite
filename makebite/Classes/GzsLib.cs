@@ -144,31 +144,31 @@ namespace SnakeBite.GzsTool
                 string name = Path.GetFileName(FileName);
                 Debug.LogLine($"[GzsLib] Extracting {name} to {OutputPath} ({Tools.GetFileSizeKB(FileName)} KB)");
 
-            using (FileStream archiveFile = new FileStream(FileName, FileMode.Open))
-            {
-                List<string> outFiles = new List<string>();
-                T archive = new T();
-                archive.Name = Path.GetFileName(FileName);
-                archive.Read(archiveFile);
-
-                // Extract all files
-                var exportedFiles = archive.ExportFiles(archiveFile);
-                foreach (var v in exportedFiles)
+                using (FileStream archiveFile = new FileStream(FileName, FileMode.Open))
                 {
-                    string outDirectory = Path.Combine(OutputPath, Path.GetDirectoryName(v.FileName));
-                    string outFileName = Path.Combine(OutputPath, v.FileName);
-                    if (!Directory.Exists(outDirectory)) Directory.CreateDirectory(outDirectory);
-                    using (FileStream outStream = new FileStream(outFileName, FileMode.Create))
+                    List<string> outFiles = new List<string>();
+                    T archive = new T();
+                	archive.Name = Path.GetFileName(FileName);
+                    archive.Read(archiveFile);
+
+                    // Extract all files
+                    var exportedFiles = archive.ExportFiles(archiveFile);
+                    foreach (var v in exportedFiles)
                     {
-                        // copy to output stream
-                        v.DataStream().CopyTo(outStream);
-                        outFiles.Add(v.FileName);
+                        string outDirectory = Path.Combine(OutputPath, Path.GetDirectoryName(v.FileName));
+                        string outFileName = Path.Combine(OutputPath, v.FileName);
+                        if (!Directory.Exists(outDirectory)) Directory.CreateDirectory(outDirectory);
+                        using (FileStream outStream = new FileStream(outFileName, FileMode.Create))
+                        {
+                            // copy to output stream
+                            v.DataStream().CopyTo(outStream);
+                            outFiles.Add(v.FileName);
+                        }
                     }
-                }
                     Debug.LogLine($"[GzsLib] Extracted {outFiles.Count} files from {name}");
-                return outFiles;
+                    return outFiles;
+                }
             }
-        }
         }
 
         // Extract single file from archive
@@ -182,37 +182,37 @@ namespace SnakeBite.GzsTool
             else
             {
                 Debug.LogLine(String.Format("[GzsLib] Extracting file {1}: {0} -> {2}", FilePath, SourceArchive, OutputFile));
-            // Get file hash from path
-            ulong fileHash = Tools.NameToHash(FilePath);
+                // Get file hash from path
+                ulong fileHash = Tools.NameToHash(FilePath);
 
-            using (FileStream archiveFile = new FileStream(SourceArchive, FileMode.Open))
-            {
-                T archive = new T();
-                archive.Name = Path.GetFileName(SourceArchive);
-                archive.Read(archiveFile);
-
-                // Select single file for output
-                var outFile = archive.ExportFiles(archiveFile).FirstOrDefault(entry => Tools.NameToHash(entry.FileName) == fileHash);
-
-                if (outFile != null)
+                using (FileStream archiveFile = new FileStream(SourceArchive, FileMode.Open))
                 {
-                    string path = Path.GetDirectoryName(Path.GetFullPath(OutputFile));
-                    if (!Directory.Exists(path)) Directory.CreateDirectory(path);
-                    using (FileStream outStream = new FileStream(OutputFile, FileMode.Create))
+                    T archive = new T();
+                    archive.Name = Path.GetFileName(SourceArchive);
+                    archive.Read(archiveFile);
+
+                    // Select single file for output
+                    var outFile = archive.ExportFiles(archiveFile).FirstOrDefault(entry => Tools.NameToHash(entry.FileName) == fileHash);
+
+                    if (outFile != null)
                     {
-                        // copy to output stream
-                        outFile.DataStream().CopyTo(outStream);
-                    }
-                    return true;
+                        string path = Path.GetDirectoryName(Path.GetFullPath(OutputFile));
+                        if (!Directory.Exists(path)) Directory.CreateDirectory(path);
+                        using (FileStream outStream = new FileStream(OutputFile, FileMode.Create))
+                        {
+                            // copy to output stream
+                            outFile.DataStream().CopyTo(outStream);
+                        }
+                        return true;
                     }
                     else
-                {
-                    // file not found
-                    return false;
+                    {
+                        // file not found
+                        return false;
+                    }
                 }
             }
-        }
-
+            
         }
 
         // Extract single file from archive
@@ -226,36 +226,36 @@ namespace SnakeBite.GzsTool
             else
             {
                 Debug.LogLine(String.Format("[GzsLib] Extracting file from {1}: hash {0} -> {2}", FileHash, SourceArchive, OutputFile));
-            // Get file hash from path
-            ulong fileHash = FileHash;
+                // Get file hash from path
+                ulong fileHash = FileHash;
 
-            using (FileStream archiveFile = new FileStream(SourceArchive, FileMode.Open))
-            {
-                T archive = new T();
-                archive.Name = Path.GetFileName(SourceArchive);
-                archive.Read(archiveFile);
-
-                // Select single file for output
-                var outFile = archive.ExportFiles(archiveFile).FirstOrDefault(entry => Tools.NameToHash(entry.FileName) == fileHash);
-
-                if (outFile != null)
+                using (FileStream archiveFile = new FileStream(SourceArchive, FileMode.Open))
                 {
-                    if (!Directory.Exists(Path.GetDirectoryName(OutputFile))) Directory.CreateDirectory(Path.GetDirectoryName(OutputFile));
-                    using (FileStream outStream = new FileStream(OutputFile, FileMode.Create))
+                    T archive = new T();
+                    archive.Name = Path.GetFileName(SourceArchive);
+                    archive.Read(archiveFile);
+
+                    // Select single file for output
+                    var outFile = archive.ExportFiles(archiveFile).FirstOrDefault(entry => Tools.NameToHash(entry.FileName) == fileHash);
+
+                    if (outFile != null)
                     {
-                        // copy to output stream
-                        outFile.DataStream().CopyTo(outStream);
-                    }
-                    return true;
+                        if (!Directory.Exists(Path.GetDirectoryName(OutputFile))) Directory.CreateDirectory(Path.GetDirectoryName(OutputFile));
+                        using (FileStream outStream = new FileStream(OutputFile, FileMode.Create))
+                        {
+                            // copy to output stream
+                            outFile.DataStream().CopyTo(outStream);
+                        }
+                        return true;
                     }
                     else
-                {
-                    // file not found
-                    return false;
+                    {
+                        // file not found
+                        return false;
+                    }
                 }
             }
-        }
-
+            
         }
 
         // Read file hashes contained within QAR archive
@@ -270,19 +270,19 @@ namespace SnakeBite.GzsTool
             {
                 string name = Path.GetFileName(ArchiveName);
                 Debug.LogLine($"[GzsLib] Reading archive contents: {name} ({Tools.GetFileSizeKB(ArchiveName)} KB)");
-            using (FileStream archiveFile = new FileStream(ArchiveName, FileMode.Open))
-            {
-                List<GameFile> archiveContents = new List<GameFile>();
-                T archive = new T();
-                archive.Name = Path.GetFileName(ArchiveName);
-                archive.Read(archiveFile);
-                foreach (var x in archive.ExportFiles(archiveFile))
+                using (FileStream archiveFile = new FileStream(ArchiveName, FileMode.Open))
                 {
-                    archiveContents.Add(new GameFile() { FilePath = x.FileName, FileHash = Tools.NameToHash(x.FileName), QarFile = archive.Name });
+                    List<GameFile> archiveContents = new List<GameFile>();
+                    T archive = new T();
+                	archive.Name = Path.GetFileName(ArchiveName);
+                    archive.Read(archiveFile);
+                    foreach (var x in archive.ExportFiles(archiveFile))
+                    {
+                        archiveContents.Add(new GameFile() { FilePath = x.FileName, FileHash = Tools.NameToHash(x.FileName), QarFile = archive.Name });
+                    }
+                    return archiveContents;
                 }
-                return archiveContents;
             }
-        }
         }
 
         /// <summary>
@@ -300,19 +300,19 @@ namespace SnakeBite.GzsTool
             {
                 string name = Path.GetFileName(qarPath);
                 Debug.LogLine($"[GzsLib] Reading archive contents: {name}");
-            using (FileStream archiveFile = new FileStream(qarPath, FileMode.Open))
-            {
-                var qarFiles = new Dictionary<ulong, GameFile>();
-                var qarFile = new QarFile();
-                qarFile.Name = Path.GetFileName(qarPath);
-                qarFile.Read(archiveFile);
-                foreach (QarEntry entry in qarFile.Entries)
+                using (FileStream archiveFile = new FileStream(qarPath, FileMode.Open))
                 {
-                    qarFiles[entry.Hash] = new GameFile() { FilePath = entry.FilePath, FileHash = entry.Hash, QarFile = qarFile.Name };
+                    var qarFiles = new Dictionary<ulong, GameFile>();
+                    var qarFile = new QarFile();
+                qarFile.Name = Path.GetFileName(qarPath);
+                    qarFile.Read(archiveFile);
+                    foreach (QarEntry entry in qarFile.Entries)
+                    {
+                        qarFiles[entry.Hash] = new GameFile() { FilePath = entry.FilePath, FileHash = entry.Hash, QarFile = qarFile.Name };
+                    }
+                    return qarFiles;
                 }
-                return qarFiles;
             }
-        }
         }
 
 
@@ -333,19 +333,19 @@ namespace SnakeBite.GzsTool
             {
                 string name = Path.GetFileName(ArchiveName);
                 Debug.LogLine($"[GzsLib] Reading archive contents: {name}");
-            using (FileStream archiveFile = new FileStream(ArchiveName, FileMode.Open))
-            {
-                List<string> archiveContents = new List<string>();
-                T archive = new T();
-                archive.Name = Path.GetFileName(ArchiveName);
-                archive.Read(archiveFile);
-                foreach (var x in archive.ExportFiles(archiveFile))
+                using (FileStream archiveFile = new FileStream(ArchiveName, FileMode.Open))
                 {
-                    archiveContents.Add(x.FileName);
+                    List<string> archiveContents = new List<string>();
+                    T archive = new T();
+                archive.Name = Path.GetFileName(ArchiveName);
+                    archive.Read(archiveFile);
+                    foreach (var x in archive.ExportFiles(archiveFile))
+                    {
+                        archiveContents.Add(x.FileName);
+                    }
+                    return archiveContents;
                 }
-                return archiveContents;
             }
-        }
         }
 
         /// <summary>

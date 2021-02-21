@@ -149,7 +149,7 @@ namespace SnakeBite.GzsTool
                 {
                     List<string> outFiles = new List<string>();
                     T archive = new T();
-                archive.Name = Path.GetFileName(FileName);
+                	archive.Name = Path.GetFileName(FileName);
                     archive.Read(archiveFile);
 
                     // Extract all files
@@ -275,7 +275,7 @@ namespace SnakeBite.GzsTool
                 {
                     List<GameFile> archiveContents = new List<GameFile>();
                     T archive = new T();
-                archive.Name = Path.GetFileName(ArchiveName);
+                	archive.Name = Path.GetFileName(ArchiveName);
                     archive.Read(archiveFile);
                     foreach (var x in archive.ExportFiles(archiveFile))
                     {
@@ -549,7 +549,7 @@ namespace SnakeBite.GzsTool
             }//if fpkFilesSorted.Count
             return fpkFilesSorted;
         }// SortFpksFiles
-        
+
         public static bool IsExtensionValidForArchive(string fileName, string archiveName)
         {
             var archiveExtension = Path.GetExtension(archiveName).TrimStart('.');

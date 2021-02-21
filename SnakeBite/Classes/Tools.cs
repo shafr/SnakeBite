@@ -1,12 +1,11 @@
 ﻿using GzsTool.Core.Utility;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 using ICSharpCode.SharpZipLib.Zip;
 using System.Xml.Serialization;
-using System.Collections;
-using System;
 using System.Threading;
 
 namespace SnakeBite
