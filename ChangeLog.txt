@@ -1,5 +1,10 @@
 Changelog
-0.9.1.6
+0.9.1.8
+SnakeBite/MakeBite:
+Fpk sorting fix.
+FpkType fix.
+
+0.9.1.7
 SnakeBite/MakeBite:
 Gameversion update to 1.0.15.2
 
