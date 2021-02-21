@@ -215,6 +215,7 @@ namespace SnakeBite
 
         internal static ulong NameToHash(string FileName)
         {
+            // regenerate hash for file
             string filePath = Tools.ToQarPath(FileName);
             ulong hash = Hashing.HashFileNameWithExtension(filePath);
             // find hashed names, which will be in root
@@ -325,6 +326,10 @@ namespace SnakeBite
             }
 
             return string.Format("{0:n0}", size / 1024);
+        }
+
+        internal static Version GetMBVersion() {
+            return System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
         }
     }
 }

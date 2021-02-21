@@ -4,6 +4,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
+using ICSharpCode.SharpZipLib.Zip;
+using System.Xml.Serialization;
+using System.Threading;
 
 namespace SnakeBite
 {
@@ -157,6 +160,29 @@ namespace SnakeBite
             //"xml"
         };
 
+        public static ModEntry ReadMetaData(string ModFile)
+        {
+            if (!File.Exists(ModFile)) return null;
+
+            try
+            {
+                using (FileStream streamMod = new FileStream(ModFile, FileMode.Open))
+                using (ZipFile zipMod = new ZipFile(streamMod))
+                {
+                    var metaIndex = zipMod.FindEntry("metadata.xml", true);
+                    if (metaIndex == -1) return null;
+                    using (StreamReader metaReader = new StreamReader(zipMod.GetInputStream(metaIndex)))
+                    {
+                        XmlSerializer x = new XmlSerializer(typeof(ModEntry));
+                        var metaData = (ModEntry)x.Deserialize(metaReader);
+                        return metaData;
+                    }
+                }
+            }
+            catch { return null; }
+
+        }
+        
         public static string ToWinPath(string Path)
         {
             return Path.Replace("/", "\\").TrimStart('\\');
@@ -197,10 +223,8 @@ namespace SnakeBite
                 string fileName = filePath.TrimStart('/');
                 string fileNoExt = fileName.Substring(0, fileName.IndexOf("."));
                 string fileExt = fileName.Substring(fileName.IndexOf(".") + 1);
-
                 //tex NMC aparently cant use HashFileNameWithExtension with undictionaried/files with hash names
                 // tryParseHash will fail for non hashed files in root (currently only init.lua and foxpatch.dat)
-                // see also duplicate function in makebite/classes/tools NameToHash
                 bool tryParseHash = ulong.TryParse(fileNoExt, System.Globalization.NumberStyles.HexNumber, System.Globalization.CultureInfo.CurrentCulture, out hash);
                 if (tryParseHash) // successfully parsed filename
                 {
@@ -232,8 +256,78 @@ namespace SnakeBite
             return false;
         }
 
-        internal static Version GetMBVersion()
+        public static void DeleteDirectory(string target_dir)
         {
+            //Debug.LogLine("[Cleanup Debug] Removing " + target_dir);
+            foreach (string file in Directory.EnumerateFiles(target_dir))
+            {
+                //Debug.LogLine("[Cleanup Debug] Setting FileAttributes for " + file);
+                File.SetAttributes(file, FileAttributes.Normal);
+                //Debug.LogLine("[Cleanup Debug] Deleting " + file);
+                File.Delete(file);
+            }
+            foreach (string dir in Directory.EnumerateDirectories(target_dir))
+            {
+                //Debug.LogLine("[Cleanup Debug] Deleting " + dir);
+                DeleteDirectory(dir);
+            }
+
+            //Debug.LogLine("[Cleanup Debug] Deleting " + target_dir);
+            DirectoryInfo target = new DirectoryInfo(target_dir);
+            if (target.GetFiles().Length == 0)
+                Directory.Delete(target_dir, true);
+            else
+            {
+                Thread.Sleep(50);
+                DeleteDirectory(target_dir);
+            }
+        }
+
+        public static void DirectoryCopy(string sourceDirName, string destDirName, bool copySubDirs)
+        {
+            // Get the subdirectories for the specified directory.
+            DirectoryInfo dir = new DirectoryInfo(sourceDirName);
+            if (dir.Exists)
+            {
+                DirectoryInfo[] dirs = dir.GetDirectories();
+                // If the destination directory doesn't exist, create it.
+                if (!Directory.Exists(destDirName))
+                {
+                    Directory.CreateDirectory(destDirName);
+                }
+
+                // Get the files in the directory and copy them to the new location.
+                FileInfo[] files = dir.GetFiles();
+                foreach (FileInfo file in files)
+                {
+                    string temppath = Path.Combine(destDirName, file.Name);
+                    file.CopyTo(temppath, true);
+                }
+
+                // If copying subdirectories, copy them and their contents to new location.
+                if (copySubDirs)
+                {
+                    foreach (DirectoryInfo subdir in dirs)
+                    {
+                        string temppath = Path.Combine(destDirName, subdir.Name);
+                        DirectoryCopy(subdir.FullName, temppath, copySubDirs);
+                    }
+                }
+            }
+        }
+
+        public static string GetFileSizeKB(params string[] filePaths)
+        {
+            long size = 0;
+            foreach(string filePath in filePaths)
+            {
+                size += new FileInfo(filePath).Length;
+            }
+
+            return string.Format("{0:n0}", size / 1024);
+        }
+
+        internal static Version GetMBVersion() {
             return System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
         }
     }
