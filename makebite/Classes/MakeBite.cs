@@ -174,7 +174,7 @@ namespace makebite
                 fpkFiles.Add(inQarName);
             }
 
-            GzsLib.WriteFpkArchive(FpkType, FpkFile, FpkFolder, fpkFiles);
+            GzsLib.WriteFpkArchive(FpkFile, FpkFolder, fpkFiles);
 
             return fpkList;
         }
