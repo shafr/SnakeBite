@@ -297,7 +297,8 @@ namespace SnakeBite
                 }
 
                 var buildFiles = moddedFpkFiles.Except(removeFilePathList).ToList();
-                GzsLib.WriteFpkArchive(workingZeroQarPath, "_build", buildFiles); // writes the pack back to _working folder (leaving out the non-native fpk files)
+                FpkType fpkType = workingZeroQarPath.EndsWith(".fpk") ? FpkType.Fpk : FpkType.Fpkd;
+                GzsLib.WriteFpkArchive(fpkType, workingZeroQarPath, "_build", buildFiles); // writes the pack back to _working folder (leaving out the non-native fpk files)
                 foreach (string removeFilePath in removeFilePathList)
                 {
                     int indexToRemove = gameData.GameFpkEntries.FindIndex(entry => entry.FilePath == removeFilePath);

@@ -251,7 +251,8 @@ namespace SnakeBite
                     var extrPack = GzsLib.ExtractArchive<FpkFile>(modQarSource, "_build");
                     pulledPack = pulledPack.Union(extrPack).ToList();
                     //foreach(string file in extrPack) Debug.LogLine(string.Format("{0} is listed in the archive extr", file));
-                    GzsLib.WriteFpkArchive(workingDestination, "_build", pulledPack);
+                    FpkType fpkType = workingDestination.EndsWith(".fpk") ? FpkType.Fpk : FpkType.Fpkd;
+                    GzsLib.WriteFpkArchive(fpkType, workingDestination, "_build", pulledPack);
                 }
                 else
                 {
