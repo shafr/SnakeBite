@@ -3,6 +3,7 @@ Changelog
 SnakeBite/MakeBite:
 Fpk sorting fix.
 FpkType fix.
+Fpk References preserved.
 
 0.9.1.7
 SnakeBite/MakeBite:
