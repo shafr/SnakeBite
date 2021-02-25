@@ -143,41 +143,37 @@ namespace makebite
 
             return ListFiles;
         }
-
-        public static List<ModFpkEntry> BuildFpk(string FpkFolder, string rootDir)
-        {
-            Debug.LogLine($"[BuildFpk] {FpkFolder}.");
-            string FpkName = FpkFolder.Substring(FpkFolder.LastIndexOf("\\") + 1).Replace("_fpk", ".fpk");
-            string FpkBuildFolder = FpkFolder.Substring(0, FpkFolder.TrimEnd('\\').LastIndexOf("\\"));
-            //string FpkXmlFile = FpkBuildFolder + "\\" + FpkName + ".xml";
-            string FpkFile = FpkBuildFolder + "\\" + FpkName;
-            string FpkType = FpkFolder.Substring(FpkFolder.LastIndexOf("_") + 1);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sourceFpkFolder">path to folder that contains the files that will go into the fpk (with fpk-internal layout)</param>
+        /// <param name="destFpkName"></param>
+        /// <param name="rootDir">The root the fpk will go into, used by smakebite to derive the qar-internal path</param>
+        /// <param name="fpkReferences"></param>
+        /// <returns></returns>
+        public static List<ModFpkEntry> BuildFpk(string sourceFpkFolder, string destFpkName, string rootDir, List<string> fpkReferences) {
+            SnakeBite.Debug.LogLine($"[BuildFpk] {sourceFpkFolder}.");
 
             List<string> fpkFiles = new List<string>();
-
             List<ModFpkEntry> fpkList = new List<ModFpkEntry>();
-
-            foreach (string FileName in Directory.GetFiles(FpkFolder, "*.*", SearchOption.AllDirectories))
-            {
-                if (!GzsLib.IsExtensionValidForArchive(FileName, FpkName))
-                {
-                    Debug.LogLine($"[BuildFpk] {FileName} is not a valid file for a {Path.GetExtension(FpkName)} archive.");
+            foreach (string fileName in Directory.GetFiles(sourceFpkFolder, "*.*", SearchOption.AllDirectories)) {
+                if (!GzsLib.IsExtensionValidForArchive(fileName, destFpkName)) {
+                    SnakeBite.Debug.LogLine($"[BuildFpk] {fileName} is not a valid file for a {Path.GetExtension(destFpkName)} archive.");
                     continue;
                 }
+                string inQarName = fileName.Substring(sourceFpkFolder.Length).Replace("\\", "/");//tex actually fpk-internal name, but as fpks are subsets of qars then?
+                fpkFiles.Add(inQarName);
 
-                string inQarName = FileName.Substring(FpkFolder.Length).Replace("\\", "/");
                 fpkList.Add(new ModFpkEntry() {
                     FilePath = inQarName,
-                    FpkFile = Tools.ToQarPath(FpkFile.Substring(rootDir.Length)),
-                    ContentHash = Tools.GetMd5Hash(FileName)
+                    FpkFile = Tools.ToQarPath(destFpkName.Substring(rootDir.Length)),//qar-internal name of fpk
+                    ContentHash = Tools.GetMd5Hash(fileName)
                 });
-                fpkFiles.Add(inQarName);
-            }
-
-            GzsLib.WriteFpkArchive(FpkFile, FpkFolder, fpkFiles);
+            }//foreach filename
+            GzsLib.WriteFpkArchive(destFpkName, sourceFpkFolder, fpkFiles, fpkReferences);
 
             return fpkList;
-        }
+        }//BuildFpk
 
         public static void BuildArchive(string SourceDir, ModEntry metaData, string outputFilePath)
         {
@@ -195,6 +191,7 @@ namespace makebite
 
             Directory.CreateDirectory("_build");
 
+            //try and update hashed names of fpks
             List<string> fpkFiles = Directory.GetFiles(SourceDir, "*.fpk*", SearchOption.AllDirectories).ToList();
             for (int i = fpkFiles.Count - 1; i >= 0; i--)
             {
@@ -211,9 +208,10 @@ namespace makebite
                         }
                     }
                 }
-            }
-
+            }//for fpkFiles
+      
             List<string> fpkFolders = ListFpkFolders(SourceDir);
+            //try and update hashed names of fpk folders
             for (int i = fpkFolders.Count - 1; i >= 0; i--)
             {
                 string fpkFolder = fpkFolders[i].Substring(SourceDir.Length + 1);
@@ -231,14 +229,16 @@ namespace makebite
                         }
                     }
                 }
-            }
+            }//for fpkFolders
 
             // check for FPKs that must be built and build
             metaData.ModFpkEntries = new List<ModFpkEntry>();
             List<string> builtFpks = new List<string>();
+            var fpkReferences = new List<string>();//TODO: allow user to specify references
             foreach (string FpkFullDir in fpkFolders)
             {
-                foreach (ModFpkEntry fpkEntry in BuildFpk(FpkFullDir, SourceDir))
+                string destFpkName = FpkFullDir.Replace("_fpk", ".fpk");
+                foreach (ModFpkEntry fpkEntry in BuildFpk(FpkFullDir, destFpkName, SourceDir, fpkReferences))
                 {
                     metaData.ModFpkEntries.Add(fpkEntry);
                     if (!builtFpks.Contains(fpkEntry.FpkFile)) builtFpks.Add(fpkEntry.FpkFile);

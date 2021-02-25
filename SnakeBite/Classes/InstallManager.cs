@@ -251,7 +251,10 @@ namespace SnakeBite
                     var extrPack = GzsLib.ExtractArchive<FpkFile>(modQarSource, "_build");
                     pulledPack = pulledPack.Union(extrPack).ToList();
                     //foreach(string file in extrPack) Debug.LogLine(string.Format("{0} is listed in the archive extr", file));
-                    GzsLib.WriteFpkArchive(workingDestination, "_build", pulledPack);
+                    //TODO: merge referenced from mod archive to (but then that would probably be tricky keeping track of for Unmerge)
+                    //I think only fpks have references (not fpkd), but whatev.
+                    var fpkReferences = GzsLib.GetFpkReferences(existingQarSource);
+                    GzsLib.WriteFpkArchive(workingDestination, "_build", pulledPack, fpkReferences);
                 }
                 else
                 {

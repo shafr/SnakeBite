@@ -260,6 +260,7 @@ namespace SnakeBite
             {
                 // create a list of fpk filepaths that need to be modified for the specific qar file (either restored to vanilla or removed from the pack)
                 List<string> fpkPathsForThisQar = partialRemoveFpkEntries.Where(entry => entry.FpkFile == partialEditQarEntry.FilePath).Select(fpkEntry => Tools.ToWinPath(fpkEntry.FilePath)).ToList();
+                var fpkReferences = new List<string>();//tex references in fpk that need to be preserved/transfered to the rebuilt fpk
 
                 // pull the vanilla qar file from the game archive, send to _gameFpk folder
                 string winQarEntryPath = Tools.ToWinPath(partialEditQarEntry.FilePath);
@@ -269,6 +270,7 @@ namespace SnakeBite
                     string vanillaArchivePath = Path.Combine(GameDir, "master\\" + partialEditQarEntry.SourceName);
                     //Debug.LogLine(string.Format("Pulling {0} from {1}", partialRemoveQarEntry.FilePath, partialRemoveQarEntry.SourceName));
                     GzsLib.ExtractFileByHash<QarFile>(vanillaArchivePath, partialEditQarEntry.Hash, gameQarPath);
+                    fpkReferences = GzsLib.GetFpkReferences(vanillaArchivePath);
                 }
                 // pull the modded qar file from _working0 (assumed to already exist when the uninstall process reads 00.dat), send to _build folder
                 string workingZeroQarPath = Path.Combine("_working0", winQarEntryPath);
@@ -297,7 +299,11 @@ namespace SnakeBite
                 }
 
                 var buildFiles = moddedFpkFiles.Except(removeFilePathList).ToList();
-                GzsLib.WriteFpkArchive(workingZeroQarPath, "_build", buildFiles); // writes the pack back to _working folder (leaving out the non-native fpk files)
+                //tex refs werent grabbed from vanilla (or there weren't any in there in that case we're probably doubling the work lol)
+                if (fpkReferences.Count == 0) {
+                    fpkReferences = GzsLib.GetFpkReferences(workingZeroQarPath);
+                }
+                GzsLib.WriteFpkArchive(workingZeroQarPath, "_build", buildFiles, fpkReferences); // writes the pack back to _working folder (leaving out the non-native fpk files)
                 foreach (string removeFilePath in removeFilePathList)
                 {
                     int indexToRemove = gameData.GameFpkEntries.FindIndex(entry => entry.FilePath == removeFilePath);
