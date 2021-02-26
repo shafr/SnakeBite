@@ -270,7 +270,7 @@ namespace SnakeBite
                     string vanillaArchivePath = Path.Combine(GameDir, "master\\" + partialEditQarEntry.SourceName);
                     //Debug.LogLine(string.Format("Pulling {0} from {1}", partialRemoveQarEntry.FilePath, partialRemoveQarEntry.SourceName));
                     GzsLib.ExtractFileByHash<QarFile>(vanillaArchivePath, partialEditQarEntry.Hash, gameQarPath);
-                    fpkReferences = GzsLib.GetFpkReferences(vanillaArchivePath);
+                    fpkReferences = GzsLib.GetFpkReferences(gameQarPath);
                 }
                 // pull the modded qar file from _working0 (assumed to already exist when the uninstall process reads 00.dat), send to _build folder
                 string workingZeroQarPath = Path.Combine("_working0", winQarEntryPath);
