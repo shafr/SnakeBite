@@ -171,7 +171,7 @@ namespace makebite
         {
             string[] args = Environment.GetCommandLineArgs();
             string modPath = Properties.Settings.Default.LastModDir;
-            if (args.Length == 2) modPath = Path.GetFullPath(args[1]);
+            if (args.Length == 2) modPath = Path.GetFullPath(args[1]);//first arg (0) is always exePathFileName
 
             textModPath.Text = modPath;
             comboForVersion.SelectedIndex = comboForVersion.Items.Count - 1;
@@ -181,6 +181,11 @@ namespace makebite
                 PopulateBoxes(modPath);
                 if (args.Length == 2)      // if command line was specified
                 {
+                    //tex better, but will be a breaking change for any authors used to the current output path\filename
+                    //string folderName = Path.GetFileName(modPath.TrimEnd(Path.DirectorySeparatorChar));
+                    //string parentPath = Directory.GetParent(modPath).ToString();
+                    //DoBuild($"{parentPath}\\{folderName}.mgsv");
+
                     DoBuild(Path.Combine(modPath, "mod.mgsv"));
                     Application.Exit();    // build and exit
                 }
