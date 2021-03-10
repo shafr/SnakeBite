@@ -282,6 +282,7 @@ namespace SnakeBite.GzsTool
             foreach (var reference in fpkFile.References) {
                 fpkReferences.Add(reference.FilePath);
             }
+            Debug.LogLine($"[GzsLib] GetFpkReferences: found {fpkReferences.Count} in {fpkPath}");
             return fpkReferences;
         }//GetFpkReferences
 
