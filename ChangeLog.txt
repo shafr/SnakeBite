@@ -2,6 +2,8 @@ Changelog
 0.9.1.6
 SnakeBite/MakeBite:
 Gameversion update to 1.0.15.2
+Fix: Uninstall missing a couple of files, files created by snakebite after install will still remain.
+Command Line: now will default to install, now processes all non parameter args as directories of .mgsvs or .mgsvs
 
 0.9.1.6
 SnakeBite:
