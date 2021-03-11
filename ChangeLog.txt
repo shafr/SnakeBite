@@ -4,12 +4,11 @@ SnakeBite/MakeBite:
 Fpk sorting fix.
 FpkType fix.
 Fpk References preserved.
+SnakeBite command line: default to install, process all non parameter args as paths to .mgsv or folder of .mgsvs
 
 0.9.1.7
 SnakeBite/MakeBite:
 Gameversion update to 1.0.15.2
-Fix: Uninstall missing a couple of files, files created by snakebite after install will still remain.
-Command Line: now will default to install, now processes all non parameter args as directories of .mgsvs or .mgsvs
 
 0.9.1.6
 SnakeBite:
