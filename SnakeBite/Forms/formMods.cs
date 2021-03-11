@@ -147,32 +147,31 @@ namespace SnakeBite
         /// <summary>
         /// command-line install.
         /// </summary>
-        internal void ProcessInstallMod(string installModPath, bool skipConflictChecks, bool skipCleanup)
+        internal void ProcessInstallMod(List<string> installPaths, bool skipConflictChecks, bool skipCleanup)
         {
-            List<string> InstallFileList = null;
-            if (File.Exists(installModPath) && installModPath.Contains(".mgsv"))
-            {
-                InstallFileList = new List<string> { installModPath };
-            }
-            else
-            {
-                if (Directory.Exists(installModPath))
-                {
-                    InstallFileList = Directory.GetFiles(installModPath, "*.mgsv").ToList();
-                    if (InstallFileList.Count == 0)
-                    {
-                        Debug.LogLine($"[Install] Could not find any .mgsv files in {installModPath}.", Debug.LogLevel.Basic);
-                        return;
+            List<string> InstallFileList = new List<string>();
+
+            foreach (string installModPath in installPaths) {
+                if (File.Exists(installModPath) && installModPath.Contains(".mgsv")) {
+                    InstallFileList.Add(installModPath);
+                } else {
+                    if (Directory.Exists(installModPath)) {
+                        var folderFiles = Directory.GetFiles(installModPath, "*.mgsv");
+                        foreach (string mgsv in folderFiles) {
+                            InstallFileList.Add(mgsv);
+                        }
+                        if (InstallFileList.Count == 0) {
+                            Debug.LogLine($"[Install] Could not find any .mgsv files in {installModPath}.", Debug.LogLevel.Basic);
+                        }
+                        InstallFileList.Sort();
+                    } else {
+                        Debug.LogLine($"[Install] Could not find file or directory {installModPath}.", Debug.LogLevel.Basic);
                     }
                 }
-                else
-                {
-                    Debug.LogLine($"[Install] Could not find file or directory {installModPath}.", Debug.LogLevel.Basic);
-                    return;
-                }
             }
-            if (InstallFileList == null)
+            if (InstallFileList.Count == 0)
             {
+                Debug.LogLine($"[Install] Could not find any .mgsv files in installPaths.", Debug.LogLevel.Basic);
                 return;
             }
             if (!skipConflictChecks)
@@ -182,22 +181,31 @@ namespace SnakeBite
                     if (!PreinstallManager.CheckConflicts(modPath)) return;
                 }
             }
-            ProgressWindow.Show("Installing Mod", $"Installing {installModPath}...",
+            string displayPath = InstallFileList[0];
+            if (InstallFileList.Count > 1) {
+                displayPath = $"{displayPath} and {InstallFileList.Count} mods";
+            }
+            ProgressWindow.Show("Installing Mod", $"Installing {displayPath}...",
                 new Action((MethodInvoker)delegate { InstallManager.InstallMods(InstallFileList, skipCleanup); }
             ), log);
             this.Invoke((MethodInvoker)delegate { RefreshInstalledMods(); });
         }
-
-        public void ProcessUninstallMod(ModEntry mod, bool skipcleanup)// command-line uninstall. This checks the mod it was passed, and puts it in a 1-item list to be uninstalled.
+        //TODO: not enough info in ModEntry to match uninstall using passed in filename
+        public void ProcessUninstallMod(List<string> modPaths, bool skipcleanup)// command-line uninstall using list of mod names
         {
-            for (int i = 0; i < listInstalledMods.Items.Count; i++)
-            {
+            for (int i = 0; i < listInstalledMods.Items.Count; i++) {
                 listInstalledMods.SetItemCheckState(i, CheckState.Unchecked);
             }
+
             var mods = manager.GetInstalledMods();
-            listInstalledMods.SetItemCheckState(mods.IndexOf(mod), CheckState.Checked);
-            CheckedListBox.CheckedIndexCollection checkedModIndex = listInstalledMods.CheckedIndices;
-            ProgressWindow.Show("Uninstalling Mod", "Uninstalling...", new Action((MethodInvoker)delegate { UninstallManager.UninstallMods(checkedModIndex, skipcleanup); }), log);
+            foreach (string modPath in modPaths) {
+                ModEntry mod = mods.FirstOrDefault(entry => entry.Name == modPath); // select mod
+                if (mod != null) {
+                    listInstalledMods.SetItemCheckState(mods.IndexOf(mod), CheckState.Checked);
+                }
+            }
+            CheckedListBox.CheckedIndexCollection checkedModIndices = listInstalledMods.CheckedIndices;
+            ProgressWindow.Show("Uninstalling Mod", "Uninstalling...", new Action((MethodInvoker)delegate { UninstallManager.UninstallMods(checkedModIndices, skipcleanup); }), log);
         }
 
         private void RefreshInstalledMods(bool resetSelection = false) // Clears and then repopulates the installed mod list

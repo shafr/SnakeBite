@@ -1,8 +1,10 @@
 ﻿using SnakeBite.Forms;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Windows.Forms;
 
 namespace SnakeBite
@@ -15,6 +17,7 @@ namespace SnakeBite
         [STAThread]
         private static void Main(string[] args)
         {
+            //if (Debugger.IsAttached == false) Debugger.Launch();//DEBUG
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             ICSharpCode.SharpZipLib.Zip.ZipConstants.DefaultCodePage = 437;
@@ -102,11 +105,12 @@ namespace SnakeBite
             // Parse command line arguments
             bool doCmdLine = false;             // Process command line args?
             bool closeApp = false;              // Close app after?
-            bool install = false;               // Install = true, uninstall = false
+            bool install = true;               // Install = true, uninstall = false
             bool resetDatHash = false;          // Rehash dat file
             bool skipConflictChecks = false;
             bool skipCleanup = false;            // Skip CleanupDatabase
-            string installFile = String.Empty;
+            List<string> modPaths = new List<string>();
+            //tex: because of the fallthrough will default to install if given just a path, so you can drag .mgsv over snakebite.exe or put it in send-to menu.
             if (args.Length > 0)
             {
                 foreach (string arg in args)
@@ -138,7 +142,7 @@ namespace SnakeBite
                             break;
 
                         default:
-                            installFile = arg;
+                            modPaths.Add(arg);
                             doCmdLine = true;
                             break;
                     }
@@ -211,19 +215,19 @@ namespace SnakeBite
             if (doCmdLine)
             {
                 Debug.LogLine("Doing cmd line args");
+                string exeDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                Directory.SetCurrentDirectory(exeDir);
+
                 formMods ModForm = new formMods();
                 ModForm.Show();
                 ModForm.Hide();
                 if (install)
                 {
-                    ModForm.ProcessInstallMod(installFile, skipConflictChecks, skipCleanup); // install mod
+                    ModForm.ProcessInstallMod(modPaths, skipConflictChecks, skipCleanup); // install mod
                 } else
                 {
                     // uninstall
-                    var mods = manager.GetInstalledMods();
-                    ModEntry mod = mods.FirstOrDefault(entry => entry.Name == installFile); // select mod
-                    if (mod != null)
-                        ModForm.ProcessUninstallMod(mod, skipCleanup); // uninstall mod
+                    ModForm.ProcessUninstallMod(modPaths, skipCleanup); // uninstall mod
                 }
                 ModForm.Dispose();
 
