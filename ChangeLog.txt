@@ -4,7 +4,8 @@ SnakeBite/MakeBite:
 Fpk sorting fix.
 FpkType fix.
 Fpk References preserved.
-SnakeBite command line: default to install, process all non parameter args as paths to .mgsv or folder of .mgsvs
+Fix: Uninstall missing a couple of files, files created by snakebite after install will still remain.
+SnakeBite command line: now defaults to install, and wil process all non parameter args as paths to .mgsv or folder of .mgsvs
 
 0.9.1.7
 SnakeBite/MakeBite:
