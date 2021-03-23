@@ -13,7 +13,7 @@ namespace SnakeBite
     {
         // GAMEVERSION > You will have to update everything here when the game updates, search for GAMEVERSION to find other areas than need to be updated
         internal static string vanillaDatHash = "36DCF52AD8EE498F6FCF529976D7C8E11240EF2F06D9D193851C5AE45D8D46BF"; //expected original hash for 1.0.15.2 // To generate this run snakebite and toggle mods off, then look for the latest '[UpdateDatHash] Updated 00/01 dat hash to' in the log or grab it from the snakebite.xml
-        internal static Version IntendedGameVersion = new Version(1, 0, 15, 2);
+        internal static Version IntendedGameVersion = new Version(1, 0, 15, 3);
 
         internal const int MAXZEROSIZE = 496340000; // ballpark estimates of vanilla archive filesizes. max/min by 10k? morbid do you want to document your reasoning on this?
         internal const int MINZEROSIZE = 496320000;
@@ -268,7 +268,7 @@ namespace SnakeBite
         public bool IsUpToDate(Version ModVersion) //shouldn't be in settingsmanager
         {
             bool isUpToDate = ModManager.GetMGSVersion() == ModVersion;
-            bool isSpecialCase = ModVersion == new Version(0, 0, 0, 0); //REF || ModVersion == new Version(1, 0, 14, 0) || ModVersion == new Version(1,0,15,1); // GAMEVERSION 
+            bool isSpecialCase = ModVersion == new Version(0, 0, 0, 0) || ModVersion == new Version(1, 0, 15, 2); // GAMEVERSION 1.0.15.2 vs .3 was just an exe change, so allow .2
             return isUpToDate || isSpecialCase;
         }
 
