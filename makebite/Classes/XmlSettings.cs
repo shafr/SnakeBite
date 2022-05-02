@@ -66,6 +66,9 @@ namespace SnakeBite
         [XmlArray("FileEntries")]
         public List<ModFileEntry> ModFileEntries { get; set; } = new List<ModFileEntry>();
 
+        [XmlArray("WmvEntries")]
+        public List<ModWmvEntry> ModWmvEntries { get; set; } = new List<ModWmvEntry>();
+
         public void ReadFromFile(string Filename)
         {
             // Read mod metadata from xml
@@ -106,6 +109,7 @@ namespace SnakeBite
             ModQarEntries = loaded.ModQarEntries;
             ModFpkEntries = loaded.ModFpkEntries;
             ModFileEntries = loaded.ModFileEntries;
+            ModWmvEntries = loaded.ModWmvEntries;
 
             s.Close();
         }
@@ -159,5 +163,12 @@ namespace SnakeBite
 
         [XmlAttribute("ContentHash")]
         public string ContentHash { get; set; }
+    }
+
+    [XmlType("WmvEntry")]
+    public class ModWmvEntry
+    {
+        [XmlAttribute("Hash")]
+        public ulong Hash { get; set; }
     }
 }

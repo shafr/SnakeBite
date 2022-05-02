@@ -153,6 +153,7 @@ namespace SnakeBite
             Debug.LogLine("[Uninstall] Removing any unmodified fpk entries", Debug.LogLevel.Basic);
             RemoveDemoddedQars(ref zeroFiles, fullRemoveQarPaths);
 
+            bool isRemovingWMV = false; //ZIP: WMV Support
             GameData gameData = SBBuildManager.GetGameData();
             foreach (ModEntry uninstallMod in uninstallMods)
             {
@@ -163,8 +164,19 @@ namespace SnakeBite
 
                 Debug.LogLine(String.Format("[Uninstall] Removing any loose textures for {0}", uninstallMod.Name), Debug.LogLevel.Basic);
                 UninstallLooseFtexs(uninstallMod, ref oneFilesList, ref gameData);
+
+                //ZIP: WMV Support
+                if (!isRemovingWMV)
+                {
+                    if (uninstallMod.ModWmvEntries.Count > 0)
+                        isRemovingWMV = true;
+                }
             }
+
             SBBuildManager.SetGameData(gameData);
+
+            //ZIP: Are we removing any mods containing custom WMVs? If so, update.
+            if (isRemovingWMV)ModManager.UpdateFoxfs(SBBuildManager.GetInstalledMods());
         }
 
         private static void GetFpkRemovalLists(List<ModEntry> uninstallMods, out List<string> fullRemoveQarPaths, out List<ModQarEntry> partialEditQarEntries, out List<ModFpkEntry> partialEditFpkEntries)

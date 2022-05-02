@@ -140,6 +140,7 @@ namespace SnakeBite
             FastZip unzipper = new FastZip();
             GameData gameData = manager.GetGameData();
 
+            bool isAddingWMV = false; //ZIP: WMV Support
             foreach (string modFilePath in modFilePaths) 
             {
                 Debug.LogLine($"[Install] Installation started: {Path.GetFileName(modFilePath)}", Debug.LogLevel.Basic);
@@ -183,9 +184,18 @@ namespace SnakeBite
                 Debug.LogLine("[Install] Copying game dir files", Debug.LogLevel.Basic);
                 InstallGameDirFiles(extractedModEntry, ref gameData);
 
+                //ZIP: WMV Support
+                if (!isAddingWMV)
+                {
+                    if (extractedModEntry.ModWmvEntries.Count > 0)
+                        isAddingWMV = true;
+                }
             }
 
             manager.SetGameData(gameData);
+
+            //ZIP: Are we installing any mods containing custom WMVs? If so, update.
+            if (isAddingWMV) ModManager.UpdateFoxfs(manager.GetInstalledMods());
         }
 
         private static void ValidateModEntries(ref ModEntry modEntry)
