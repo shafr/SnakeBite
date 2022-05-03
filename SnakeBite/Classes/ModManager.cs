@@ -433,6 +433,24 @@ namespace SnakeBite
             return (MessageBox.Show("Would you still like to continue the setup process?", "Continue Setup?", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes);
         }
 
+        public static void AddChunks(ref List<string> foxfsLine, string debugName)//ZIP: Retain additional chunk support
+        {
+            string[] linesToAdd = new string[8]
+                         {
+                    "		<chunk id=\"0\" label=\"old\" qar=\"a_chunk7.dat\" textures=\"a_texture7.dat\"/>",
+                    "		<chunk id=\"1\" label=\"cypr\" qar=\"chunk0.dat\" textures=\"texture0.dat\"/>",
+                    "		<chunk id=\"2\" label=\"base\" qar=\"chunk1.dat\" textures=\"texture1.dat\"/>",
+                    "		<chunk id=\"3\" label=\"afgh\" qar=\"chunk2.dat\" textures=\"texture2.dat\"/>",
+                    "		<chunk id=\"4\" label=\"mtbs\" qar=\"chunk3.dat\" textures=\"texture3.dat\"/>",
+                    "		<chunk id=\"5\" label=\"mafr\" qar=\"chunk4.dat\" textures=\"texture4.dat\"/>",
+                    "		<chunk id=\"6\" label=\"mgo\" qar=\"chunk5_mgo0.dat\" textures=\"texture5_mgo0.dat\"/>",
+                    "		<chunk id=\"7\" label=\"gzs\" qar=\"chunk6_gzs0.dat\" textures=\"texture6_gzs0.dat\"/>",
+                         };
+            int startIndex = foxfsLine.IndexOf("		<chunk id=\"0\" label=\"cypr\" qar=\"chunk0.dat\" textures=\"texture0.dat\"/>");
+            foxfsLine.RemoveRange(startIndex, 6);
+            foxfsLine.InsertRange(startIndex, linesToAdd);
+        }
+
         public static bool ModifyFoxfs() // edits the chunk/texture lines in foxfs.dat to accommodate a_chunk7 a_texture7, MGO and GZs data.
         {
             CleanupFolders();
@@ -449,33 +467,14 @@ namespace SnakeBite
                     {
                         Debug.LogLine("[ModifyFoxfs] foxfs.dat is unmodified, extracting chunk0.dat.", Debug.LogLevel.Debug);
                         List<string> chunk0Files = GzsLib.ExtractArchive<QarFile>(chunk0Path, "_extr"); //extract chunk0 into _extr
-
-
-                        string[] linesToAdd = new string[8]
-                        {
-                    "		<chunk id=\"0\" label=\"old\" qar=\"a_chunk7.dat\" textures=\"a_texture7.dat\"/>",
-                    "		<chunk id=\"1\" label=\"cypr\" qar=\"chunk0.dat\" textures=\"texture0.dat\"/>",
-                    "		<chunk id=\"2\" label=\"base\" qar=\"chunk1.dat\" textures=\"texture1.dat\"/>",
-                    "		<chunk id=\"3\" label=\"afgh\" qar=\"chunk2.dat\" textures=\"texture2.dat\"/>",
-                    "		<chunk id=\"4\" label=\"mtbs\" qar=\"chunk3.dat\" textures=\"texture3.dat\"/>",
-                    "		<chunk id=\"5\" label=\"mafr\" qar=\"chunk4.dat\" textures=\"texture4.dat\"/>",
-                    "		<chunk id=\"6\" label=\"mgo\" qar=\"chunk5_mgo0.dat\" textures=\"texture5_mgo0.dat\"/>",
-                    "		<chunk id=\"7\" label=\"gzs\" qar=\"chunk6_gzs0.dat\" textures=\"texture6_gzs0.dat\"/>",
-                        };
-                        Debug.LogLine("[ModifyFoxfs] Updating foxfs.dat", Debug.LogLevel.Debug);
                         var foxfsLine = File.ReadAllLines(foxfsOutPath).ToList();   // read the file
-                        int startIndex = foxfsLine.IndexOf("		<chunk id=\"0\" label=\"cypr\" qar=\"chunk0.dat\" textures=\"texture0.dat\"/>");
-
-                        foxfsLine.RemoveRange(startIndex, 6);
-                        foxfsLine.InsertRange(startIndex, linesToAdd);
-
+                        Debug.LogLine("[ModifyFoxfs] Updating foxfs.dat", Debug.LogLevel.Debug);
+                        AddChunks(ref foxfsLine, "ModifyFoxfs"); //ZIP: Retain additional chunk support
                         File.WriteAllLines(foxfsOutPath, foxfsLine); // write to file
 
-                        Debug.LogLine("[ModifyFoxfs] repacking chunk0.dat", Debug.LogLevel.Debug);
-
                         //Build chunk0.dat.SB_Build with modified foxfs
+                        Debug.LogLine("[ModifyFoxfs] repacking chunk0.dat", Debug.LogLevel.Debug);
                         GzsLib.WriteQarArchive(chunk0Path + build_ext, "_extr", chunk0Files, GzsLib.chunk0Flags);
-
                     }
                     else
                     {
@@ -501,6 +500,73 @@ namespace SnakeBite
                 MessageBox.Show(string.Format("An error has occured while modifying foxfs in chunk0: {0}", e), "Exception Occurred", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 Debug.LogLine(string.Format("[ModifyFoxfs] Exception Occurred: {0}", e), Debug.LogLevel.Basic);
                 Debug.LogLine("[ModifyFoxfs] SnakeBite has failed to modify foxfs in chunk0", Debug.LogLevel.Basic);
+
+                return false;
+            }
+        }
+
+        public static bool UpdateFoxfs( List<ModEntry> mods ) //Updates foxfs to accommodate wmvs
+        {
+            Debug.LogLine("[UpdateFoxfs] Beginning foxfs.dat check.", Debug.LogLevel.Debug);
+            try
+            {
+                List<string> chunk0Files = GzsLib.ExtractArchive<QarFile>(chunk0Path, "_chunk0"); //ZIP: extract chunk0.dat into _chunk0
+                string foxfsInPath = "foxfs.dat";
+                string foxfsOutPath = "_chunk0\\foxfs.dat";
+                if (GzsLib.ExtractFile<QarFile>(chunk0Path + ".original", foxfsInPath, foxfsOutPath)) {          
+                    Debug.LogLine("[UpdateFoxfs] Updating foxfs.dat", Debug.LogLevel.Debug);
+                    var foxfsLine = File.ReadAllLines(foxfsOutPath).ToList();   // read the file
+
+                    //ZIP: Process all custom WMVs.
+                    Debug.LogLine("[UpdateFoxfs] Checking installed mods", Debug.LogLevel.Debug);
+                    HashSet<ulong> customWMVs = new HashSet<ulong>();
+                    foreach (ModEntry mod in mods)
+                    {
+                        foreach (ModWmvEntry entry in mod.ModWmvEntries)
+                        {
+                            customWMVs.Add(entry.Hash);
+                        }
+                    }
+
+                    if (customWMVs.Count > 0) //ZIP: If any custom WMVs are found, add them to safiles.
+                    {           
+                        Debug.LogLine("[UpdateFoxfs] Adding custom WMVs to foxfs.dat", Debug.LogLevel.Debug);
+                        int wmvIndex = foxfsLine.IndexOf("	</safiles>"); // ZIP: Add custom wmvs to the end, for JP/EN compatibility
+                        foxfsLine.RemoveAt(wmvIndex);
+                        foreach (ulong wmvHash in customWMVs)
+                        {
+                            foxfsLine.Insert(wmvIndex, "		<file code=\"" + wmvHash + "\"/>");
+                            wmvIndex += 1;
+                        }
+                        foxfsLine.Insert(wmvIndex, "	</safiles>");
+                    }
+                    else
+                    {
+                        Debug.LogLine("[UpdateFoxfs] No custom WMVs found", Debug.LogLevel.Debug);
+                    }
+                    AddChunks(ref foxfsLine, "UpdateFoxfs"); //ZIP: Retain additional chunk support
+                    File.WriteAllLines(foxfsOutPath, foxfsLine); // write to file
+                    GzsLib.WriteQarArchive(chunk0Path, "_chunk0", chunk0Files, GzsLib.chunk0Flags); //ZIP: Repacking chunk0.dat with updated foxfs.dat
+                }
+                else
+                {
+                    MessageBox.Show(string.Format("Setup cancelled: SnakeBite failed to extract foxfs from chunk0."), "foxfs check failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    Debug.LogLine("[UpdateFoxfs] Process failed: could not check foxfs.dat", Debug.LogLevel.Debug);
+                    CleanupFolders();
+
+                    return false;
+                }
+
+                Debug.LogLine("[UpdateFoxfs] Archive modification complete.", Debug.LogLevel.Debug);
+                CleanupFolders();
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(string.Format("An error has occured while updating foxfs in chunk0: {0}", e), "Exception Occurred", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Debug.LogLine(string.Format("[UpdateFoxfs] Exception Occurred: {0}", e), Debug.LogLevel.Basic);
+                Debug.LogLine("[UpdateFoxfs] SnakeBite has failed to update foxfs in chunk0", Debug.LogLevel.Basic);
 
                 return false;
             }
@@ -764,6 +830,7 @@ namespace SnakeBite
             "_build",
             "_gameFpk",
             "_modfpk",
+            "_chunk0", //ZIP: WMV Support
         };
 
         public static void CleanupFolders() // deletes the work folders which contain extracted files from 00/01

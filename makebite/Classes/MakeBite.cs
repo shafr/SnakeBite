@@ -303,20 +303,32 @@ namespace makebite
             }
 
             metaData.ModQarEntries = new List<ModQarEntry>();
+            metaData.ModWmvEntries = new List<ModWmvEntry>(); //ZIP: Custom WMV Support
             foreach (string qarFile in qarFiles)
             {
                 string subDir = qarFile.Substring(0, qarFile.LastIndexOf("\\")).Substring(SourceDir.Length).TrimStart('\\'); // the subdirectory for XML output
                 string qarFilePath = Tools.ToQarPath(qarFile.Substring(SourceDir.Length));
-                
-                if (!Directory.Exists(Path.Combine("_build", subDir))) Directory.CreateDirectory(Path.Combine("_build", subDir)); // create file structure
-                File.Copy(qarFile, Path.Combine("_build", Tools.ToWinPath(qarFilePath)), true);
+ 
+                if (!qarFilePath.Contains("/Assets/tpp/movie/Win/"))
+                {
+                    if (!Directory.Exists(Path.Combine("_build", subDir))) Directory.CreateDirectory(Path.Combine("_build", subDir)); // create file structure
+                    File.Copy(qarFile, Path.Combine("_build", Tools.ToWinPath(qarFilePath)), true);
 
-                ulong hash = Tools.NameToHash(qarFilePath);
-                metaData.ModQarEntries.Add(new ModQarEntry() {
-                    FilePath = qarFilePath,
-                    Compressed = qarFile.EndsWith(".fpk") || qarFile.EndsWith(".fpkd") ? true : false,
-                    ContentHash = Tools.GetMd5Hash(qarFile), Hash = hash
-                });
+                    ulong hash = Tools.NameToHash(qarFilePath);
+                    metaData.ModQarEntries.Add(new ModQarEntry()
+                    {
+                        FilePath = qarFilePath,
+                        Compressed = qarFile.EndsWith(".fpk") || qarFile.EndsWith(".fpkd") ? true : false,
+                        ContentHash = Tools.GetMd5Hash(qarFile),
+                        Hash = hash
+                    });            
+                }
+                else //ZIP: If any .dat files are found in "/Assets/tpp/movie/Win/", add them to WmvEntries. But don't add them to QarEntries.
+                {
+                    //TODO: Get HashFileNameWithExtension to work with strings containing ".wmv"
+                    ulong datToWMV = 3924887075253387264; //ZIP: .wmv extension doesn't hash properly. Hack.
+                    metaData.ModWmvEntries.Add(new ModWmvEntry() { Hash = Tools.NameToHash(qarFilePath) + datToWMV });
+                }
             }
 
             //tex build external entries
