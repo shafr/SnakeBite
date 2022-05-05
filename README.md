@@ -1,5 +1,7 @@
 # SnakeBite
 SnakeBite is a mod manager/launcher for Metal Gear Solid V (PC/Steam).
+Releases at Nexusmods: https://www.nexusmods.com/metalgearsolidvtpp/mods/106
+Current fork at: https://github.com/TinManTex/SnakeBite
 
 ## Getting started with SnakeBite
 Before running makebite make sure the 00.dat and 01.dat in MGSV_TPP\master\0 are unmodified.
@@ -56,7 +58,7 @@ While the disable compatability check setting will bypass this, it is likely to 
 Snakebite prints information to Log.txt in its install folder.
 Check this before you close snakebite (since it's cleared on next snakebite start) to see if there's any error messages. 
 
-# Developers
+# Mod Developers
 
 Use MakeBite (included) to create .MGSV mod files compatible with SnakeBite
 
@@ -96,3 +98,6 @@ this was to smooth over my 'build tool' process - which basically just copies ov
 # Found a bug?
 
 Please submit a bug report to GitHub with as much detail as possible. Please include log.txt, which is accessed by double clicking the version in the main window, or found in your SnakeBite install directory (default %LocalAppData%\SnakeBite). Warning: the logfile is reset every time you launch SnakeBite so please save it immediately after the application crashes.
+
+# Snakebite Developers
+See Developers.txt
