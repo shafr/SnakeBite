@@ -433,7 +433,7 @@ namespace SnakeBite
             return (MessageBox.Show("Would you still like to continue the setup process?", "Continue Setup?", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes);
         }
 
-        public static void AddChunks(ref List<string> foxfsLine, string debugName)//ZIP: Retain additional chunk support
+        public static void AddChunks(ref List<string> foxfsLine)//ZIP: Retain additional chunk support
         {
             string[] linesToAdd = new string[8]
                          {
@@ -469,7 +469,7 @@ namespace SnakeBite
                         List<string> chunk0Files = GzsLib.ExtractArchive<QarFile>(chunk0Path, "_extr"); //extract chunk0 into _extr
                         var foxfsLine = File.ReadAllLines(foxfsOutPath).ToList();   // read the file
                         Debug.LogLine("[ModifyFoxfs] Updating foxfs.dat", Debug.LogLevel.Debug);
-                        AddChunks(ref foxfsLine, "ModifyFoxfs"); //ZIP: Retain additional chunk support
+                        AddChunks(ref foxfsLine); //ZIP: Retain additional chunk support
                         File.WriteAllLines(foxfsOutPath, foxfsLine); // write to file
 
                         //Build chunk0.dat.SB_Build with modified foxfs
@@ -544,7 +544,7 @@ namespace SnakeBite
                     {
                         Debug.LogLine("[UpdateFoxfs] No custom WMVs found", Debug.LogLevel.Debug);
                     }
-                    AddChunks(ref foxfsLine, "UpdateFoxfs"); //ZIP: Retain additional chunk support
+                    AddChunks(ref foxfsLine); //ZIP: Retain additional chunk support
                     File.WriteAllLines(foxfsOutPath, foxfsLine); // write to file
                     GzsLib.WriteQarArchive(chunk0Path, "_chunk0", chunk0Files, GzsLib.chunk0Flags); //ZIP: Repacking chunk0.dat with updated foxfs.dat
                 }
@@ -552,13 +552,13 @@ namespace SnakeBite
                 {
                     MessageBox.Show(string.Format("Setup cancelled: SnakeBite failed to extract foxfs from chunk0."), "foxfs check failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     Debug.LogLine("[UpdateFoxfs] Process failed: could not check foxfs.dat", Debug.LogLevel.Debug);
-                    CleanupFolders();
+                    CleanupFolders("_chunk0");
 
                     return false;
                 }
 
                 Debug.LogLine("[UpdateFoxfs] Archive modification complete.", Debug.LogLevel.Debug);
-                CleanupFolders();
+                CleanupFolders("_chunk0");
 
                 return true;
             }
@@ -833,13 +833,20 @@ namespace SnakeBite
             "_chunk0", //ZIP: WMV Support
         };
 
-        public static void CleanupFolders() // deletes the work folders which contain extracted files from 00/01
+        public static void CleanupFolders(string selectedFolder = "") // deletes the work folders which contain extracted files from 00/01
         {
             Debug.LogLine("[Mod] Cleaning up snakebite work folders.");
             try
             {
                 foreach (var folder in cleanupFolders)
                 {
+                    //ZIP: WMV Support
+                    if (selectedFolder.Length > 0)
+                    {
+                        if (selectedFolder != folder)
+                            continue;
+                    }
+
                     if (Directory.Exists(folder))
                     {
                         Tools.DeleteDirectory(folder);
