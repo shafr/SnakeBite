@@ -74,7 +74,9 @@ Section "SnakeBite" SecMain
   
   ;ADD YOUR OWN FILES HERE..., dont forget to update uninstall too
   File "SnakeBite.exe"
+  File "SnakeBite.exe.config"
   File "MakeBite.exe"
+  File "MakeBite.exe.config"
   File "CityHash.dll"
   File "GzsTool.Core.dll"
   File "ICSharpCode.SharpZipLib.dll"
@@ -186,7 +188,9 @@ Section "Uninstall"
 
   ;ADD YOUR OWN FILES HERE...
   Delete "$INSTDIR\SnakeBite.exe"
+  Delete "$INSTDIR\SnakeBite.exe.config"
   Delete "$INSTDIR\MakeBite.exe"
+  Delete "$INSTDIR\MakeBite.exe.config"
   Delete "$INSTDIR\CityHash.dll"
   Delete "$INSTDIR\GzsTool.Core.dll"
   Delete "$INSTDIR\ICSharpCode.SharpZipLib.dll"

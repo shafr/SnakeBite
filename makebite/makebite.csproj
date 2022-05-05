@@ -168,6 +168,7 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>xcopy /y "$(TargetDir)MakeBite.exe" "$(SolutionDir)installerbuild\"
+xcopy /y "$(TargetDir)MakeBite.exe.config" "$(SolutionDir)installerbuild\"
 </PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
