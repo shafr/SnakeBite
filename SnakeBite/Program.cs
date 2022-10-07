@@ -19,6 +19,7 @@ namespace SnakeBite
         {
             //if (Debugger.IsAttached == false) Debugger.Launch();//DEBUG
             Application.EnableVisualStyles();
+            Application.SetHighDpiMode(HighDpiMode.SystemAware);
             Application.SetCompatibleTextRenderingDefault(false);
             ICSharpCode.SharpZipLib.Zip.ZipConstants.DefaultCodePage = 437;
             SettingsManager manager = new SettingsManager(GamePaths.SnakeBiteSettings);
