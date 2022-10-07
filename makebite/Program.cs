@@ -14,6 +14,7 @@ namespace makebite
         {
             ICSharpCode.SharpZipLib.Zip.ZipConstants.DefaultCodePage = 437;
             Application.EnableVisualStyles();
+            Application.SetHighDpiMode(HighDpiMode.SystemAware);
             Application.SetCompatibleTextRenderingDefault(false);
             
             Debug.Clear();
