@@ -50,7 +50,7 @@
             this.menuItem4 = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemExit = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemOptions = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuItemSkipLauncher = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemSkipLauncher = new System.Windows.Forms.ToolStripMenuItem(;
             this.menuItem11 = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemOpenSettings = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemHelp = new System.Windows.Forms.ToolStripMenuItem();
@@ -378,7 +378,7 @@
             this.Controls.Add(this.panelModList);
             this.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            //this.Menu = this.mainMenuMods;
+            this.MainMenuStrip=this.mainMenuMods;
             this.MinimumSize = new System.Drawing.Size(637, 450);
             this.Name = "formMods";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Show;
