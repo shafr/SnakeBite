@@ -175,7 +175,7 @@
             // 
             // menuItemFile
             // 
-            this.menuItemFile.Index = 0;
+            //this.menuItemFile.Index = 0;
             this.menuItemFile.DropDownItems.AddRange(new System.Windows.Forms.ToolStripDropDownItem[] {
             this.menuItemOpenDir,
             this.menuItemOpenMakeBite,
@@ -190,58 +190,58 @@
             // 
             // menuItemOpenDir
             // 
-            this.menuItemOpenDir.Index = 0;
+           // this.menuItemOpenDir.Index = 0;
             this.menuItemOpenDir.Text = "Open Game Directory";
             this.menuItemOpenDir.Click += new System.EventHandler(this.menuItemOpenDir_Click);
             // 
             // menuItemOpenMakeBite
             // 
-            this.menuItemOpenMakeBite.Index = 1;
+            //this.menuItemOpenMakeBite.Index = 1;
             this.menuItemOpenMakeBite.Text = "Launch MakeBite";
             this.menuItemOpenMakeBite.Click += new System.EventHandler(this.menuItemOpenMakeBite_Click);
             // 
             // menuItem6
             // 
-            this.menuItem6.Index = 2;
+            //this.menuItem6.Index = 2;
             this.menuItem6.Text = "-";
             // 
             // menuItemBrowseMods
             // 
-            this.menuItemBrowseMods.Index = 3;
+            //this.menuItemBrowseMods.Index = 3;
             this.menuItemBrowseMods.Text = "Browse SnakeBite Mods";
             this.menuItemBrowseMods.Click += new System.EventHandler(this.menuItemBrowseMods_Click);
             // 
             // menuItem8
             // 
-            this.menuItem8.Index = 4;
+            //this.menuItem8.Index = 4;
             this.menuItem8.Text = "-";
             // 
             // menuItemSavePreset
             // 
-            this.menuItemSavePreset.Index = 5;
+            //this.menuItemSavePreset.Index = 5;
             this.menuItemSavePreset.Text = "Save .MGSVPreset File...";
             this.menuItemSavePreset.Click += new System.EventHandler(this.menuItemSavePreset_Click);
             // 
             // menuItemLoadPreset
             // 
-            this.menuItemLoadPreset.Index = 6;
+            //this.menuItemLoadPreset.Index = 6;
             this.menuItemLoadPreset.Text = "Load .MGSVPreset File...";
             this.menuItemLoadPreset.Click += new System.EventHandler(this.menuItemLoadPreset_Click);
             // 
             // menuItem4
             // 
-            this.menuItem4.Index = 7;
+            //this.menuItem4.Index = 7;
             this.menuItem4.Text = "-";
             // 
             // menuItemExit
             // 
-            this.menuItemExit.Index = 8;
+            //this.menuItemExit.Index = 8;
             this.menuItemExit.Text = "Exit";
             this.menuItemExit.Click += new System.EventHandler(this.menuItemExit_Click);
             // 
             // menuItemOptions
             // 
-            this.menuItemOptions.Index = 1;
+            //this.menuItemOptions.Index = 1;
             this.menuItemOptions.DropDownItems.AddRange(new System.Windows.Forms.ToolStripDropDownItem[] {
             this.menuItemSkipLauncher,
             this.menuItem11,
@@ -250,24 +250,24 @@
             // 
             // menuItemSkipLauncher
             // 
-            this.menuItemSkipLauncher.Index = 0;
+            //this.menuItemSkipLauncher.Index = 0;
             this.menuItemSkipLauncher.Text = "Skip Startup Launcher";
             this.menuItemSkipLauncher.Click += new System.EventHandler(this.menuItemSkipLauncher_Click);
             // 
             // menuItem11
             // 
-            this.menuItem11.Index = 1;
+            //this.menuItem11.Index = 1;
             this.menuItem11.Text = "-";
             // 
             // menuItemOpenSettings
             // 
-            this.menuItemOpenSettings.Index = 2;
+            //this.menuItemOpenSettings.Index = 2;
             this.menuItemOpenSettings.Text = "Settings...";
             this.menuItemOpenSettings.Click += new System.EventHandler(this.menuItemOpenSettings_Click);
             // 
             // menuItemHelp
             // 
-            this.menuItemHelp.Index = 2;
+            //this.menuItemHelp.Index = 2;
             this.menuItemHelp.DropDownItems.AddRange(new System.Windows.Forms.ToolStripDropDownItem[] {
             this.menuItemLearn,
             this.menuItemWikiLink,
@@ -279,8 +279,8 @@
             // 
             // menuItemLearn
             // 
-            this.menuItemLearn.Index = 0;
-            this.menuItemLearn.MenuItems.AddRange(new System.Windows.Forms.ToolStripDropDownItem[] {
+            //this.menuItemLearn.Index = 0;
+            this.menuItemLearn.DropDownItems.AddRange(new System.Windows.Forms.ToolStripDropDownItem[] {
             this.menuItemInstalling,
             this.menuItemUninstalling,
             this.menuItemConflicts,
@@ -291,64 +291,64 @@
             // 
             // menuItemInstalling
             // 
-            this.menuItemInstalling.Index = 0;
+            //this.menuItemInstalling.Index = 0;
             this.menuItemInstalling.Text = "Installing Mods";
             this.menuItemInstalling.Click += new System.EventHandler(this.menuItemHelpInstall_Click);
             // 
             // menuItemUninstalling
             // 
-            this.menuItemUninstalling.Index = 1;
+            //this.menuItemUninstalling.Index = 1;
             this.menuItemUninstalling.Text = "Uninstalling Mods";
             this.menuItemUninstalling.Click += new System.EventHandler(this.menuItemHelpUninstall_Click);
             // 
             // menuItemConflicts
             // 
-            this.menuItemConflicts.Index = 2;
+            //this.menuItemConflicts.Index = 2;
             this.menuItemConflicts.Text = "Mod Conflicts";
             this.menuItemConflicts.Click += new System.EventHandler(this.menuItemHelpConflicts_Click);
             // 
             // menuItem3
             // 
-            this.menuItem3.Index = 3;
+            //this.menuItem3.Index = 3;
             this.menuItem3.Text = "-";
             // 
             // menuItemCreating
             // 
-            this.menuItemCreating.Index = 4;
+            //this.menuItemCreating.Index = 4;
             this.menuItemCreating.Text = "Creating Mods";
             this.menuItemCreating.Click += new System.EventHandler(this.menuItemHelpCreate_Click);
             // 
             // menuItemHelpPresets
             // 
-            this.menuItemHelpPresets.Index = 5;
+            //this.menuItemHelpPresets.Index = 5;
             this.menuItemHelpPresets.Text = "Saving/Loading Presets";
             this.menuItemHelpPresets.Click += new System.EventHandler(this.menuItemHelpPresets_Click);
             // 
             // menuItemWikiLink
             // 
-            this.menuItemWikiLink.Index = 1;
+            //this.menuItemWikiLink.Index = 1;
             this.menuItemWikiLink.Text = "Visit Modding Wiki";
             this.menuItemWikiLink.Click += new System.EventHandler(this.menuItemWikiLink_Click);
             // 
             // menuItem18
             // 
-            this.menuItem18.Index = 2;
+            //this.menuItem18.Index = 2;
             this.menuItem18.Text = "-";
             // 
             // menuItemOpenLogs
             // 
-            this.menuItemOpenLogs.Index = 3;
+            //this.menuItemOpenLogs.Index = 3;
             this.menuItemOpenLogs.Text = "Open Debug Logs";
             this.menuItemOpenLogs.Click += new System.EventHandler(this.menuItemOpenLogs_Click);
             // 
             // menuItem1
             // 
-            this.menuItem1.Index = 4;
+            //this.menuItem1.Index = 4;
             this.menuItem1.Text = "-";
             // 
             // menuItemOpenBugReport
             // 
-            this.menuItemOpenBugReport.Index = 5;
+            //this.menuItemOpenBugReport.Index = 5;
             this.menuItemOpenBugReport.Text = "Report a Bug";
             this.menuItemOpenBugReport.Click += new System.EventHandler(this.menuItemOpenBugReport_Click);
             // 
@@ -378,7 +378,7 @@
             this.Controls.Add(this.panelModList);
             this.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.Menu = this.mainMenuMods;
+            //this.Menu = this.mainMenuMods;
             this.MinimumSize = new System.Drawing.Size(637, 450);
             this.Name = "formMods";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Show;

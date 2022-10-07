@@ -48,7 +48,8 @@ namespace SnakeBite
             if (Properties.Settings.Default.formModsMaximized == true)
                 WindowState = FormWindowState.Maximized;
 
-            menuItemSkipLauncher.Checked = Properties.Settings.Default.SkipLauncher;
+            //TODO - fixme
+            //menuItemSkipLauncher.Checked = Properties.Settings.Default.SkipLauncher;
             SetModsEnabled(!BackupManager.ModsDisabled());
             AdjustSize();
 
@@ -375,9 +376,10 @@ namespace SnakeBite
 
         private void menuItemSkipLauncher_Click(object sender, EventArgs e)
         {
-            menuItemSkipLauncher.Checked = !menuItemSkipLauncher.Checked;
+            //todo-fixme
+            //menuItemSkipLauncher.Checked = !menuItemSkipLauncher.Checked;
 
-            Properties.Settings.Default.SkipLauncher = menuItemSkipLauncher.Checked;
+            //Properties.Settings.Default.SkipLauncher = menuItemSkipLauncher.Checked;
             Properties.Settings.Default.Save();
         }
 
