@@ -37,34 +37,35 @@
             this.checkBoxMarkAll = new System.Windows.Forms.CheckBox();
             this.panelContent = new System.Windows.Forms.Panel();
             this.buttonLaunchGame = new System.Windows.Forms.Button();
-            this.mainMenuMods = new System.Windows.Forms.MainMenu(this.components);
-            this.menuItemFile = new System.Windows.Forms.MenuItem();
-            this.menuItemOpenDir = new System.Windows.Forms.MenuItem();
-            this.menuItemOpenMakeBite = new System.Windows.Forms.MenuItem();
-            this.menuItem6 = new System.Windows.Forms.MenuItem();
-            this.menuItemBrowseMods = new System.Windows.Forms.MenuItem();
-            this.menuItem8 = new System.Windows.Forms.MenuItem();
-            this.menuItemSavePreset = new System.Windows.Forms.MenuItem();
-            this.menuItemLoadPreset = new System.Windows.Forms.MenuItem();
-            this.menuItem4 = new System.Windows.Forms.MenuItem();
-            this.menuItemExit = new System.Windows.Forms.MenuItem();
-            this.menuItemOptions = new System.Windows.Forms.MenuItem();
-            this.menuItemSkipLauncher = new System.Windows.Forms.MenuItem();
-            this.menuItem11 = new System.Windows.Forms.MenuItem();
-            this.menuItemOpenSettings = new System.Windows.Forms.MenuItem();
-            this.menuItemHelp = new System.Windows.Forms.MenuItem();
-            this.menuItemLearn = new System.Windows.Forms.MenuItem();
-            this.menuItemInstalling = new System.Windows.Forms.MenuItem();
-            this.menuItemUninstalling = new System.Windows.Forms.MenuItem();
-            this.menuItemConflicts = new System.Windows.Forms.MenuItem();
-            this.menuItem3 = new System.Windows.Forms.MenuItem();
-            this.menuItemCreating = new System.Windows.Forms.MenuItem();
-            this.menuItemHelpPresets = new System.Windows.Forms.MenuItem();
-            this.menuItemWikiLink = new System.Windows.Forms.MenuItem();
-            this.menuItem18 = new System.Windows.Forms.MenuItem();
-            this.menuItemOpenLogs = new System.Windows.Forms.MenuItem();
-            this.menuItem1 = new System.Windows.Forms.MenuItem();
-            this.menuItemOpenBugReport = new System.Windows.Forms.MenuItem();
+            this.mainMenuMods = new System.Windows.Forms.MenuStrip();
+            //this.mainMenuMods = new System.Windows.Forms.MenuStrip(this.components);
+            this.menuItemFile = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemOpenDir = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemOpenMakeBite = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItem6 = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemBrowseMods = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItem8 = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemSavePreset = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemLoadPreset = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItem4 = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemExit = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemOptions = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemSkipLauncher = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItem11 = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemOpenSettings = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemHelp = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemLearn = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemInstalling = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemUninstalling = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemConflicts = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItem3 = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemCreating = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemHelpPresets = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemWikiLink = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItem18 = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemOpenLogs = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemOpenBugReport = new System.Windows.Forms.ToolStripMenuItem();
             this.panelModList = new System.Windows.Forms.Panel();
             this.panelModList.SuspendLayout();
             this.SuspendLayout();
@@ -167,7 +168,7 @@
             // 
             // mainMenuMods
             // 
-            this.mainMenuMods.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
+            this.mainMenuMods.Items.AddRange(new System.Windows.Forms.ToolStripDropDownItem[] {
             this.menuItemFile,
             this.menuItemOptions,
             this.menuItemHelp});
@@ -175,7 +176,7 @@
             // menuItemFile
             // 
             this.menuItemFile.Index = 0;
-            this.menuItemFile.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
+            this.menuItemFile.DropDownItems.AddRange(new System.Windows.Forms.ToolStripDropDownItem[] {
             this.menuItemOpenDir,
             this.menuItemOpenMakeBite,
             this.menuItem6,
@@ -241,7 +242,7 @@
             // menuItemOptions
             // 
             this.menuItemOptions.Index = 1;
-            this.menuItemOptions.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
+            this.menuItemOptions.DropDownItems.AddRange(new System.Windows.Forms.ToolStripDropDownItem[] {
             this.menuItemSkipLauncher,
             this.menuItem11,
             this.menuItemOpenSettings});
@@ -267,7 +268,7 @@
             // menuItemHelp
             // 
             this.menuItemHelp.Index = 2;
-            this.menuItemHelp.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
+            this.menuItemHelp.DropDownItems.AddRange(new System.Windows.Forms.ToolStripDropDownItem[] {
             this.menuItemLearn,
             this.menuItemWikiLink,
             this.menuItem18,
@@ -279,7 +280,7 @@
             // menuItemLearn
             // 
             this.menuItemLearn.Index = 0;
-            this.menuItemLearn.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
+            this.menuItemLearn.MenuItems.AddRange(new System.Windows.Forms.ToolStripDropDownItem[] {
             this.menuItemInstalling,
             this.menuItemUninstalling,
             this.menuItemConflicts,
@@ -400,34 +401,34 @@
         private System.Windows.Forms.CheckBox checkBoxMarkAll;
         private System.Windows.Forms.Panel panelContent;
         private System.Windows.Forms.Button buttonLaunchGame;
-        private System.Windows.Forms.MainMenu mainMenuMods;
-        private System.Windows.Forms.MenuItem menuItemFile;
-        private System.Windows.Forms.MenuItem menuItemOptions;
+        private System.Windows.Forms.MenuStrip mainMenuMods;
+        private System.Windows.Forms.ToolStripDropDownItem menuItemFile;
+        private System.Windows.Forms.ToolStripDropDownItem menuItemOptions;
         private System.Windows.Forms.Panel panelModList;
-        private System.Windows.Forms.MenuItem menuItemOpenDir;
-        private System.Windows.Forms.MenuItem menuItem6;
-        private System.Windows.Forms.MenuItem menuItemBrowseMods;
-        private System.Windows.Forms.MenuItem menuItem8;
-        private System.Windows.Forms.MenuItem menuItemExit;
-        private System.Windows.Forms.MenuItem menuItemSkipLauncher;
-        private System.Windows.Forms.MenuItem menuItem11;
-        private System.Windows.Forms.MenuItem menuItemHelp;
-        private System.Windows.Forms.MenuItem menuItemOpenSettings;
-        private System.Windows.Forms.MenuItem menuItem18;
-        private System.Windows.Forms.MenuItem menuItemOpenBugReport;
-        private System.Windows.Forms.MenuItem menuItemOpenMakeBite;
-        private System.Windows.Forms.MenuItem menuItemWikiLink;
-        private System.Windows.Forms.MenuItem menuItemLearn;
-        private System.Windows.Forms.MenuItem menuItemInstalling;
-        private System.Windows.Forms.MenuItem menuItemUninstalling;
-        private System.Windows.Forms.MenuItem menuItemCreating;
-        private System.Windows.Forms.MenuItem menuItemConflicts;
-        private System.Windows.Forms.MenuItem menuItemOpenLogs;
-        private System.Windows.Forms.MenuItem menuItem1;
-        private System.Windows.Forms.MenuItem menuItemSavePreset;
-        private System.Windows.Forms.MenuItem menuItemLoadPreset;
-        private System.Windows.Forms.MenuItem menuItem4;
-        private System.Windows.Forms.MenuItem menuItem3;
-        private System.Windows.Forms.MenuItem menuItemHelpPresets;
+        private System.Windows.Forms.ToolStripDropDownItem menuItemOpenDir;
+        private System.Windows.Forms.ToolStripDropDownItem menuItem6;
+        private System.Windows.Forms.ToolStripDropDownItem menuItemBrowseMods;
+        private System.Windows.Forms.ToolStripDropDownItem menuItem8;
+        private System.Windows.Forms.ToolStripDropDownItem menuItemExit;
+        private System.Windows.Forms.ToolStripDropDownItem menuItemSkipLauncher;
+        private System.Windows.Forms.ToolStripDropDownItem menuItem11;
+        private System.Windows.Forms.ToolStripDropDownItem menuItemHelp;
+        private System.Windows.Forms.ToolStripDropDownItem menuItemOpenSettings;
+        private System.Windows.Forms.ToolStripDropDownItem menuItem18;
+        private System.Windows.Forms.ToolStripDropDownItem menuItemOpenBugReport;
+        private System.Windows.Forms.ToolStripDropDownItem menuItemOpenMakeBite;
+        private System.Windows.Forms.ToolStripDropDownItem menuItemWikiLink;
+        private System.Windows.Forms.ToolStripDropDownItem menuItemLearn;
+        private System.Windows.Forms.ToolStripDropDownItem menuItemInstalling;
+        private System.Windows.Forms.ToolStripDropDownItem menuItemUninstalling;
+        private System.Windows.Forms.ToolStripDropDownItem menuItemCreating;
+        private System.Windows.Forms.ToolStripDropDownItem menuItemConflicts;
+        private System.Windows.Forms.ToolStripDropDownItem menuItemOpenLogs;
+        private System.Windows.Forms.ToolStripDropDownItem menuItem1;
+        private System.Windows.Forms.ToolStripDropDownItem menuItemSavePreset;
+        private System.Windows.Forms.ToolStripDropDownItem menuItemLoadPreset;
+        private System.Windows.Forms.ToolStripDropDownItem menuItem4;
+        private System.Windows.Forms.ToolStripDropDownItem menuItem3;
+        private System.Windows.Forms.ToolStripDropDownItem menuItemHelpPresets;
     }
 }
