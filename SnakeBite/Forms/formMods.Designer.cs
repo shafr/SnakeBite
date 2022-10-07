@@ -50,7 +50,7 @@
             this.menuItem4 = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemExit = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemOptions = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuItemSkipLauncher = new System.Windows.Forms.ToolStripMenuItem(;
+            this.menuItemSkipLauncher = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItem11 = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemOpenSettings = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemHelp = new System.Windows.Forms.ToolStripMenuItem();
@@ -410,7 +410,7 @@
         private System.Windows.Forms.ToolStripDropDownItem menuItemBrowseMods;
         private System.Windows.Forms.ToolStripDropDownItem menuItem8;
         private System.Windows.Forms.ToolStripDropDownItem menuItemExit;
-        private System.Windows.Forms.ToolStripDropDownItem menuItemSkipLauncher;
+        private System.Windows.Forms.ToolStripMenuItem menuItemSkipLauncher;
         private System.Windows.Forms.ToolStripDropDownItem menuItem11;
         private System.Windows.Forms.ToolStripDropDownItem menuItemHelp;
         private System.Windows.Forms.ToolStripDropDownItem menuItemOpenSettings;
