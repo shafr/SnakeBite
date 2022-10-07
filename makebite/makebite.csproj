@@ -72,9 +72,10 @@
     <Compile Remove="Form1.cs" />
     <Compile Remove="Form1.Designer.cs" />
   </ItemGroup>
-  <PropertyGroup>
+  <!-- TODO - investigate  -->
+  <!-- <PropertyGroup>
     <PostBuildEvent>xcopy /y "$(TargetDir)MakeBite.exe" "$(SolutionDir)installerbuild\"
 xcopy /y "$(TargetDir)MakeBite.exe.config" "$(SolutionDir)installerbuild\"
-</PostBuildEvent>
+</PostBuildEvent> -->
   </PropertyGroup>
 </Project>
