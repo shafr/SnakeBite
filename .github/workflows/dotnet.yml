@@ -21,3 +21,23 @@ jobs:
       run: dotnet restore
     - name: Build
       run: dotnet build --no-restore
+    - uses: actions/upload-artifact@v3
+      with:
+        name: snakebite
+        path: |
+          SnakeBite.nsi
+          fpk_dictionary.txt 
+          qar_dictionary.txt
+          README.md
+          ChangeLog.txt
+          license.txt 
+          mgsvfile.ico
+          mgsvpreset.ico
+
+          SnakeBite/bin/Release/**/SnakeBite.exe
+          SnakeBite/bin/Release/**/CityHash.dll
+          # xcopy /y %targetDir%SnakeBite.exe.config
+          SnakeBite/bin/Release/**/GzsTool.Core.dll
+          SnakeBite/bin/Release/**/ICSharpCode.SharpZipLib.dll
+          SnakeBite/bin/Release/**/Zlib.Portable.dll 
+
