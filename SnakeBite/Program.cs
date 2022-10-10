@@ -21,7 +21,8 @@ namespace SnakeBite
             Application.EnableVisualStyles();
             Application.SetHighDpiMode(HighDpiMode.SystemAware);
             Application.SetCompatibleTextRenderingDefault(false);
-            ICSharpCode.SharpZipLib.Zip.ZipConstants.DefaultCodePage = 437;
+            //ICSharpCode.SharpZipLib.Zip.ZipConstants.DefaultCodePage = 437;
+            ICSharpCode.SharpZipLib.Zip.ZipStrings.CodePage = 437;
             SettingsManager manager = new SettingsManager(GamePaths.SnakeBiteSettings);
             bool updateQarFilenames = false;
             if (Properties.Settings.Default.LastSBVersion == null || new Version(Properties.Settings.Default.LastSBVersion) < ModManager.GetSBVersion())
